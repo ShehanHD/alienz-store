@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+.parcel-cache/
+
+# Env
+.env
+.env.local
+.env.production
+
+# Editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Worktrees
+.worktrees/
