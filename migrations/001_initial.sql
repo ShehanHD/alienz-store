@@ -116,3 +116,12 @@ INSERT INTO site_config (key, value) VALUES
     ('max_wishlist_items',    '50'),
     ('allow_registrations',   'true')
 ON CONFLICT (key) DO NOTHING;
+
+-- Indexes for FK columns (query performance)
+CREATE INDEX IF NOT EXISTS idx_addresses_user_id      ON addresses(user_id);
+CREATE INDEX IF NOT EXISTS idx_product_images_product ON product_images(product_id);
+CREATE INDEX IF NOT EXISTS idx_wishlist_user_id        ON wishlist_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_wishlist_product_id     ON wishlist_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_enquiries_user_id       ON enquiries(user_id);
+CREATE INDEX IF NOT EXISTS idx_enquiries_status        ON enquiries(status);
+CREATE INDEX IF NOT EXISTS idx_products_category_id    ON products(category_id);
