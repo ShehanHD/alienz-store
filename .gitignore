@@ -28,4 +28,5 @@ dist/
 *.swp
 
 # Worktrees
+.worktrees
 .worktrees/
