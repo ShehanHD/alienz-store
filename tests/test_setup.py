@@ -77,6 +77,7 @@ def test_maintenance_mode_blocks_public(client, db):
         )
     r = client.get("/shop/some-product")
     assert r.status_code == 503
+    assert r.json()["detail"] == "Site is under maintenance. Please check back soon."
 
 
 def test_maintenance_mode_allows_admin(client, db):
