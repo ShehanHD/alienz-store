@@ -38,5 +38,7 @@ def test_thumbnail_is_300x300():
 def test_output_is_webp():
     data = _make_image(400, 400)
     full, thumb = process_image(data)
-    assert Image.open(io.BytesIO(full)).format == "WEBP"
-    assert Image.open(io.BytesIO(thumb)).format == "WEBP"
+    with Image.open(io.BytesIO(full)) as img:
+        assert img.format == "WEBP"
+    with Image.open(io.BytesIO(thumb)) as img:
+        assert img.format == "WEBP"
