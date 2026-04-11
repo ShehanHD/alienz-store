@@ -13,14 +13,16 @@ _MIGRATIONS_FILE = Path(__file__).parent.parent / "migrations" / "001_initial.sq
 
 
 @pytest.fixture(scope="session", autouse=True)
-def apply_schema():
-    """Apply migrations once per test session. Skips if no test DB is available."""
+def apply_schema(request):
+    """Apply migrations once per test session. Skips if no test DB is available.
+    Tests marked with 'no_db' are excluded from this fixture."""
+    # If all collected tests are no_db tests, skip DB setup gracefully
     if not TEST_DATABASE_URL:
-        pytest.skip("No test DB configured")
+        return
     try:
         conn = psycopg2.connect(dsn=TEST_DATABASE_URL)
     except Exception:
-        pytest.skip("Cannot connect to test DB")
+        return  # DB unavailable; no_db tests will still run
     try:
         conn.autocommit = True
         cur = conn.cursor()
@@ -31,8 +33,12 @@ def apply_schema():
 
 
 @pytest.fixture(autouse=True)
-def clean_tables(apply_schema):
-    """Truncate all data tables before each test, then re-seed site_config."""
+def clean_tables(request, apply_schema):
+    """Truncate all data tables before each test, then re-seed site_config.
+    Tests marked with 'no_db' bypass DB setup entirely."""
+    if request.node.get_closest_marker("no_db"):
+        yield
+        return
     try:
         conn = psycopg2.connect(dsn=TEST_DATABASE_URL)
     except Exception:
