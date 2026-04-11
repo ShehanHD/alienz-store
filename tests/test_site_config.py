@@ -42,7 +42,8 @@ def test_owner_can_update_config(client):
 
 @pytest.mark.skip(reason="Admin promotion not built yet — revisit in Task 16")
 def test_admin_cannot_access_settings(client):
-    pass
+    # TODO Task 16: insert admin user, get admin token, assert GET /admin/settings returns 403
+    assert False, "This test must be implemented when admin promotion is available"
 
 
 def test_non_owner_cannot_read_config(client):

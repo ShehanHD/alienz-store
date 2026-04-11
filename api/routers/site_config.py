@@ -22,13 +22,13 @@ def get_settings(conn=Depends(get_db), _=Depends(require_owner)):
 
 @router.put("")
 def update_settings(
-    updates: dict,
+    updates: dict[str, str],
     conn=Depends(get_db),
     _=Depends(require_owner),
 ):
     invalid = set(updates.keys()) - VALID_KEYS
     if invalid:
-        raise HTTPException(status_code=422, detail=f"Unknown config keys: {invalid}")
+        raise HTTPException(status_code=422, detail=f"Unknown config keys: {sorted(invalid)}")
 
     with conn.cursor() as cur:
         for key, value in updates.items():
@@ -36,4 +36,6 @@ def update_settings(
                 "UPDATE site_config SET value = %s, updated_at = NOW() WHERE key = %s",
                 (str(value), key),
             )
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=422, detail=f"Config key not found: {key}")
     return {"detail": "Config updated"}
