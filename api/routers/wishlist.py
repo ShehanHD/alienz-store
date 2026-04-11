@@ -33,6 +33,8 @@ def add_to_wishlist(
 ):
     max_items = int(get_config("max_wishlist_items", conn))
     with conn.cursor() as cur:
+        # Advisory lock serialises concurrent adds for the same user, preventing TOCTOU on the cap check.
+        cur.execute("SELECT pg_advisory_xact_lock(%s)", (current_user["id"],))
         cur.execute(
             "SELECT COUNT(*) AS cnt FROM wishlist_items WHERE user_id = %s",
             (current_user["id"],),
