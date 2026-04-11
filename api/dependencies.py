@@ -1,6 +1,7 @@
 from typing import Any
 
 import psycopg2
+import psycopg2.extensions
 from psycopg2.extras import RealDictCursor
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -65,3 +66,13 @@ def require_owner(user: dict[str, Any] = Depends(get_current_user)) -> dict[str,
     if user["role"] != "owner":
         raise HTTPException(status_code=403, detail="Forbidden")
     return user
+
+
+def get_config(key: str, conn: psycopg2.extensions.connection) -> str:
+    """Read a single site_config value by key."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT value FROM site_config WHERE key = %s", (key,))
+        row = cur.fetchone()
+    if row is None:
+        raise RuntimeError(f"Missing site_config key: {key}")
+    return row["value"]
