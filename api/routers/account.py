@@ -75,12 +75,9 @@ def change_password(
             (current_user["id"],),
         )
         row = cur.fetchone()
-
-    if not row or not verify_password(body.current_password, row["hashed_password"]):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect")
-
-    new_hashed = hash_password(body.new_password)
-    with conn.cursor() as cur:
+        if not row or not verify_password(body.current_password, row["hashed_password"]):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect")
+        new_hashed = hash_password(body.new_password)
         cur.execute(
             "UPDATE users SET hashed_password = %s WHERE id = %s",
             (new_hashed, current_user["id"]),
@@ -139,4 +136,6 @@ def save_address(
             )
 
         row = cur.fetchone()
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Address save failed")
     return dict(row)
