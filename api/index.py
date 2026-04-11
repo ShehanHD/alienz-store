@@ -5,6 +5,7 @@ from api.middleware import MaintenanceModeMiddleware
 from api.routers import auth as auth_router
 from api.routers import setup as setup_router
 from api.routers import site_config as site_config_router
+from api.routers import categories as categories_router
 
 app = FastAPI(title="Clothing Store API")
 
@@ -22,6 +23,7 @@ app.add_middleware(MaintenanceModeMiddleware)
 app.include_router(setup_router.router)
 app.include_router(auth_router.router)
 app.include_router(site_config_router.router)
+app.include_router(categories_router.router)
 
 
 @app.get("/health")
