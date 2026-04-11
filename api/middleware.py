@@ -20,7 +20,7 @@ class MaintenanceModeMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             maintenance = await loop.run_in_executor(None, self._check_maintenance)
             if maintenance:
                 return JSONResponse(
