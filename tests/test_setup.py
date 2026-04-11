@@ -42,6 +42,16 @@ def test_setup_short_password_returns_422(client):
     assert r.status_code == 422, r.text
 
 
+def test_setup_second_call_with_invalid_input_returns_409(client):
+    """After setup is complete, even an invalid payload must return 409 (not 422)."""
+    r1 = client.post("/setup", json=VALID_PAYLOAD)
+    assert r1.status_code == 201, r1.text
+
+    r2 = client.post("/setup", json={**VALID_PAYLOAD, "email": "notanemail"})
+    assert r2.status_code == 409, r2.text
+    assert r2.json()["detail"] == "Setup already completed"
+
+
 def test_setup_duplicate_email_returns_409(client, db):
     """If the email already exists in the DB (e.g. race condition), returns 409 'Email already registered'."""
     # Directly insert a user with the same email

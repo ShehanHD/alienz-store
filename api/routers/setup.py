@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from uuid import UUID
+
 import psycopg2
+import psycopg2.extensions
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, EmailStr, Field
 
 from api.auth import hash_password
 from api.db import get_db
@@ -9,44 +12,26 @@ router = APIRouter()
 
 
 class SetupRequest(BaseModel):
-    email: str
-    password: str
-    first_name: str
-    last_name: str
+    email: EmailStr
+    password: str = Field(min_length=8)
+    first_name: str = Field(min_length=1, max_length=100)
+    last_name: str = Field(min_length=1, max_length=100)
 
 
 class SetupResponse(BaseModel):
     message: str
-    user_id: str
-
-
-def _validate_email(email: str) -> None:
-    """Basic email validation — must be non-empty and contain '@'."""
-    if not email or "@" not in email:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Invalid email address",
-        )
-
-
-def _validate_password(password: str) -> None:
-    """Password must be at least 8 characters."""
-    if len(password) < 8:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Password must be at least 8 characters",
-        )
+    user_id: UUID
 
 
 @router.post("/setup", response_model=SetupResponse, status_code=status.HTTP_201_CREATED)
-def setup(body: SetupRequest, conn=Depends(get_db)) -> SetupResponse:
+def setup(
+    body: SetupRequest,
+    conn: psycopg2.extensions.connection = Depends(get_db),
+) -> SetupResponse:
     """One-time owner account creation. Can only succeed once."""
-    _validate_email(body.email)
-    _validate_password(body.password)
-
     cur = conn.cursor()
     try:
-        # Check if setup has already been completed
+        # Check if setup has already been completed BEFORE validating input
         cur.execute(
             "SELECT value FROM setup_flags WHERE key = 'setup_complete'"
         )
@@ -66,7 +51,7 @@ def setup(body: SetupRequest, conn=Depends(get_db)) -> SetupResponse:
                 VALUES (%s, %s, 'owner', %s, %s)
                 RETURNING id
                 """,
-                (body.email, hashed, body.first_name, body.last_name),
+                (str(body.email), hashed, body.first_name, body.last_name),
             )
         except psycopg2.errors.UniqueViolation:
             conn.rollback()
@@ -76,7 +61,7 @@ def setup(body: SetupRequest, conn=Depends(get_db)) -> SetupResponse:
             )
 
         row = cur.fetchone()
-        user_id = str(row["id"])
+        user_id: UUID = row["id"]
 
         cur.execute(
             """

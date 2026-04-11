@@ -7,7 +7,7 @@ app = FastAPI(title="Clothing Store API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten to your Hostinger domain before going live
+    allow_origins=["http://localhost:3000"],  # replace with production domain before going live
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
