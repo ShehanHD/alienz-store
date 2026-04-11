@@ -12,6 +12,7 @@ from api.routers import enquiries as enquiries_router
 from api.routers import account as account_router
 from api.routers import wishlist as wishlist_router
 from api.routers import admin_clients as admin_clients_router
+from api.routers import admin_dashboard as admin_dashboard_router
 
 app = FastAPI(title="Clothing Store API")
 
@@ -36,6 +37,7 @@ app.include_router(enquiries_router.router)
 app.include_router(account_router.router)
 app.include_router(wishlist_router.router)
 app.include_router(admin_clients_router.router)
+app.include_router(admin_dashboard_router.router)
 
 
 @app.get("/health")
