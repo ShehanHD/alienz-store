@@ -148,6 +148,12 @@ def update_product(
     slug = _slugify(body.name)
     with conn.cursor() as cur:
         cur.execute(
+            "SELECT id FROM products WHERE slug = %s AND id != %s",
+            (slug, product_id)
+        )
+        if cur.fetchone():
+            raise HTTPException(status_code=409, detail="A product with this name already exists")
+        cur.execute(
             """
             UPDATE products SET name=%s, slug=%s, description=%s, price=%s,
                 category_id=%s, sizes=%s, colors=%s, is_active=%s, updated_at=NOW()

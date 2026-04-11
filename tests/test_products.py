@@ -18,7 +18,7 @@ def _owner_token(client):
     return r.json()["access_token"]
 
 
-def _create_product(client, token, name="Blue Dress", price="49.99"):
+def _create_product(client, token, name="Blue Dress", price=49.99):
     return client.post("/admin/products", json={
         "name": name,
         "description": "A lovely dress",
@@ -33,7 +33,7 @@ def test_public_products_returns_only_active(client):
     token = _owner_token(client)
     _create_product(client, token, "Active Dress")
     client.post("/admin/products", json={
-        "name": "Draft Dress", "price": "29.99", "is_active": False,
+        "name": "Draft Dress", "price": 29.99, "is_active": False,
     }, headers=auth_header(token))
     r = client.get("/products")
     assert r.status_code == 200
@@ -53,7 +53,7 @@ def test_public_product_detail_by_slug(client):
 def test_product_detail_404_for_inactive(client):
     token = _owner_token(client)
     client.post("/admin/products", json={
-        "name": "Hidden Item", "price": "10.00", "is_active": False,
+        "name": "Hidden Item", "price": 10.00, "is_active": False,
     }, headers=auth_header(token))
     r = client.get("/products/hidden-item")
     assert r.status_code == 404
@@ -65,7 +65,7 @@ def test_max_products_limit_enforced(client, db):
     token = _owner_token(client)
     _create_product(client, token, "First Product")
     r = client.post("/admin/products", json={
-        "name": "Second Product", "price": "20.00",
+        "name": "Second Product", "price": 20.00,
     }, headers=auth_header(token))
     assert r.status_code == 422
 
@@ -74,7 +74,7 @@ def test_admin_can_update_product(client):
     token = _owner_token(client)
     product = _create_product(client, token)
     r = client.put(f"/admin/products/{product['id']}",
-                   json={"name": "Updated Dress", "price": "59.99", "is_active": True,
+                   json={"name": "Updated Dress", "price": 59.99, "is_active": True,
                          "sizes": ["M"], "colors": ["Red"]},
                    headers=auth_header(token))
     assert r.status_code == 200
@@ -93,7 +93,7 @@ def test_filter_by_category(client):
     cat = client.post("/admin/categories", json={"name": "Skirts"},
                       headers=auth_header(token)).json()
     client.post("/admin/products", json={
-        "name": "Mini Skirt", "price": "39.99", "is_active": True,
+        "name": "Mini Skirt", "price": 39.99, "is_active": True,
         "category_id": cat["id"],
     }, headers=auth_header(token))
     _create_product(client, token, "Blue Top")
