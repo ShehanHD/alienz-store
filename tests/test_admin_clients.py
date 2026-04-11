@@ -45,14 +45,14 @@ def test_admin_promotes_client_to_admin(client, db):
         assert cur.fetchone()["role"] == "admin"
 
 
-def test_owner_cannot_be_promoted_to_admin(client):
+def test_owner_cannot_be_promoted_to_admin(client, db):
     token = _owner_token(client)
-    r = client.get("/admin/clients", headers=auth_header(token))
-    owner_accounts = [u for u in r.json()["items"] if u["role"] == "owner"]
-    if owner_accounts:
-        owner_id = owner_accounts[0]["id"]
-        r2 = client.put(f"/admin/clients/{owner_id}/promote", headers=auth_header(token))
-        assert r2.status_code == 422
+    owner_email = os.environ.get("ADMIN_EMAIL", "owner@example.com")
+    with db.cursor() as cur:
+        cur.execute("SELECT id FROM users WHERE email = %s", (owner_email,))
+        owner_id = cur.fetchone()["id"]
+    r = client.put(f"/admin/clients/{owner_id}/promote", headers=auth_header(token))
+    assert r.status_code == 422
 
 
 def test_admin_deletes_client(client, db):
