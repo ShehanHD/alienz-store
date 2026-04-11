@@ -4,6 +4,7 @@ Dependencies are exercised by mounting them on a minimal in-test FastAPI app
 because no auth router exists yet (Task 7).
 """
 import uuid
+from typing import Any
 
 import pytest
 from fastapi import Depends, FastAPI
@@ -21,15 +22,15 @@ def _make_app() -> FastAPI:
     test_app = FastAPI()
 
     @test_app.get("/me")
-    def me(user=Depends(get_current_user)):
+    def me(user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
         return {"id": str(user["id"]), "role": user["role"]}
 
     @test_app.get("/admin-only")
-    def admin_only(user=Depends(require_admin)):
+    def admin_only(user: dict[str, Any] = Depends(require_admin)) -> dict[str, Any]:
         return {"role": user["role"]}
 
     @test_app.get("/owner-only")
-    def owner_only(user=Depends(require_owner)):
+    def owner_only(user: dict[str, Any] = Depends(require_owner)) -> dict[str, Any]:
         return {"role": user["role"]}
 
     return test_app

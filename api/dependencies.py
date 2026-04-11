@@ -11,19 +11,22 @@ from .config import settings
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
+_401 = {"WWW-Authenticate": "Bearer"}
+
+
 def _decode_token(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
     """Validate the Bearer token and return its payload without touching the DB.
 
     Raising here keeps the 401 clean even when no DB is available.
     """
     if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated", headers=_401)
     payload = decode_access_token(token)
     if payload is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated", headers=_401)
     user_id: str = payload.get("sub", "")
     if not user_id:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated", headers=_401)
     return payload
 
 
@@ -36,14 +39,18 @@ def get_current_user(
     except Exception as exc:
         raise HTTPException(status_code=503, detail="Database unavailable") from exc
     try:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
-        user = cur.fetchone()
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, email, role, first_name, last_name, is_active"
+                " FROM users WHERE id = %s",
+                (user_id,),
+            )
+            user = cur.fetchone()
     finally:
         conn.close()
 
     if user is None or not user["is_active"]:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated", headers=_401)
 
     return dict(user)
 
