@@ -12,7 +12,7 @@ from api.auth import (
     verify_password,
 )
 from api.db import get_db
-from api.dependencies import get_config
+from api.dependencies import get_config, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -65,7 +65,7 @@ def register(
             )
             user = dict(cur.fetchone())
     except psycopg2.errors.UniqueViolation:
-        conn.rollback()
+        conn.rollback()  # must clear aborted txn before raising HTTPException
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
     access = create_access_token(str(user["id"]), user["role"])
@@ -77,7 +77,6 @@ def register(
         "email": user["email"],
         "role": user["role"],
         "access_token": access,
-        "refresh_token": refresh,
     }
 
 
@@ -101,7 +100,10 @@ def login(body: LoginIn, response: Response, conn=Depends(get_db)) -> dict:
 
 
 @router.post("/logout")
-def logout(response: Response) -> dict:
+def logout(
+    response: Response,
+    _: dict = Depends(get_current_user),
+) -> dict:
     response.delete_cookie(_REFRESH_COOKIE)
     return {"detail": "Logged out"}
 
