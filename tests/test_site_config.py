@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from tests.conftest import auth_header
 
 SETUP_PAYLOAD = {
@@ -38,9 +40,22 @@ def test_owner_can_update_config(client):
     assert r2.json()["max_products"] == "20"
 
 
+@pytest.mark.skip(reason="Admin promotion not built yet — revisit in Task 16")
 def test_admin_cannot_access_settings(client):
-    # Admin promotion not built yet — placeholder
     pass
+
+
+def test_non_owner_cannot_read_config(client):
+    r = client.post("/auth/register", json={
+        "email": "reader@example.com", "password": "pass1234",
+        "first_name": "R", "last_name": "U",
+    })
+    assert r.status_code == 201, r.text
+    token = client.post("/auth/login", json={
+        "email": "reader@example.com", "password": "pass1234"
+    }).json()["access_token"]
+    r = client.get("/admin/settings", headers=auth_header(token))
+    assert r.status_code == 403
 
 
 def test_non_owner_cannot_update_config(client):
