@@ -1,4 +1,5 @@
 import os
+import pytest
 from tests.conftest import auth_header
 
 SETUP_PAYLOAD = {
@@ -49,6 +50,17 @@ def test_admin_updates_category(client):
                    headers=auth_header(token))
     assert r.status_code == 200
     assert r.json()["name"] == "Tops & Shirts"
+    assert r.json()["slug"] == "tops-shirts"
+
+
+def test_unauthenticated_cannot_create_category(client):
+    r = client.post("/admin/categories", json={"name": "Shoes"})
+    assert r.status_code in (401, 403)
+
+
+@pytest.mark.skip(reason="Non-admin client role not yet buildable in tests — revisit in Task 16")
+def test_non_admin_cannot_create_category(client):
+    assert False, "Remove skip when client registration is available"
 
 
 def test_admin_deletes_category(client):

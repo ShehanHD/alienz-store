@@ -1,6 +1,6 @@
 import re
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from api.db import get_db
 from api.dependencies import require_admin
@@ -9,11 +9,14 @@ router = APIRouter(tags=["categories"])
 
 
 def _slugify(name: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    if not slug:
+        raise HTTPException(status_code=422, detail="Name must contain at least one letter or digit")
+    return slug
 
 
 class CategoryIn(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=200)
     sort_order: int = 0
 
 
@@ -47,6 +50,9 @@ def update_category(
 ):
     slug = _slugify(body.name)
     with conn.cursor() as cur:
+        cur.execute("SELECT id FROM categories WHERE slug = %s AND id != %s", (slug, category_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=409, detail="Category with this name already exists")
         cur.execute(
             "UPDATE categories SET name=%s, slug=%s, sort_order=%s WHERE id=%s "
             "RETURNING id, name, slug, sort_order",
