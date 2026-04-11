@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.middleware import MaintenanceModeMiddleware
 from api.routers import auth as auth_router
 from api.routers import setup as setup_router
 
@@ -13,6 +14,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(MaintenanceModeMiddleware)
 
 
 app.include_router(setup_router.router)

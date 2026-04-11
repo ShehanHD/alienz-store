@@ -68,3 +68,22 @@ def test_setup_duplicate_email_returns_409(client, db):
     r = client.post("/setup", json=VALID_PAYLOAD)
     assert r.status_code == 409, r.text
     assert r.json()["detail"] == "Email already registered"
+
+
+def test_maintenance_mode_blocks_public(client, db):
+    with db.cursor() as cur:
+        cur.execute(
+            "UPDATE site_config SET value = 'true' WHERE key = 'maintenance_mode'"
+        )
+    r = client.get("/shop/some-product")
+    assert r.status_code == 503
+
+
+def test_maintenance_mode_allows_admin(client, db):
+    with db.cursor() as cur:
+        cur.execute(
+            "UPDATE site_config SET value = 'true' WHERE key = 'maintenance_mode'"
+        )
+    r = client.get("/admin/dashboard")
+    # 404 because route not yet registered, but NOT 503
+    assert r.status_code != 503
