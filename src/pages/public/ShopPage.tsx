@@ -12,6 +12,7 @@ export function ShopPage() {
   const [data, setData] = useState<PaginatedResponse<Product> | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const page = parseInt(params.get('page') ?? '1', 10)
   const category = params.get('category') ?? undefined
@@ -22,12 +23,15 @@ export function ShopPage() {
 
   useEffect(() => {
     setLoading(true)
-    void getProducts({ page, category, page_size: 12 })
+    setError(null)
+    getProducts({ page, category, page_size: 12 })
       .then(setData)
+      .catch(() => setError('Failed to load products. Please try again.'))
       .finally(() => setLoading(false))
   }, [page, category])
 
   if (loading) return <Spinner />
+  if (error) return <p>{error}</p>
 
   return (
     <div className={styles.page}>
