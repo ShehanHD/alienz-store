@@ -1,21 +1,10 @@
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { getApiClient } from '../../api/client'
-import type { Enquiry } from '../../types'
+import { EnquirySchema } from '../../api/schemas'
 import styles from './OrdersPage.module.css'
 
-const EnquiryStatusSchema = z.enum(['new', 'read', 'replied'])
-
-const EnquirySchema = z.object({
-  id: z.string().uuid(),
-  user_id: z.string().uuid().nullable(),
-  product_id: z.string().uuid().nullable(),
-  name: z.string(),
-  email: z.string().email(),
-  message: z.string(),
-  status: EnquiryStatusSchema,
-  created_at: z.string(),
-})
+type Enquiry = z.infer<typeof EnquirySchema>
 
 const EnquiriesListSchema = z.array(EnquirySchema)
 
@@ -47,7 +36,7 @@ export function OrdersPage() {
       {!loading && !error && enquiries.length === 0 && (
         <p className={styles.empty}>No orders yet.</p>
       )}
-      {!loading && enquiries.length > 0 && (
+      {!loading && !error && enquiries.length > 0 && (
         <ul className={styles.list}>
           {enquiries.map((enq) => (
             <li key={enq.id} className={styles.item}>

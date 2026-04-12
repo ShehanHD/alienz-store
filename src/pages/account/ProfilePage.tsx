@@ -21,6 +21,7 @@ export function ProfilePage() {
   // Password state
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [pwError, setPwError] = useState<string | null>(null)
   const [pwSuccess, setPwSuccess] = useState(false)
   const [pwSaving, setPwSaving] = useState(false)
@@ -58,6 +59,14 @@ export function ProfilePage() {
 
   async function handlePasswordSubmit(e: FormEvent) {
     e.preventDefault()
+    if (newPassword.length < 8) {
+      setPwError('New password must be at least 8 characters.')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError('Passwords do not match.')
+      return
+    }
     setPwSaving(true)
     setPwError(null)
     setPwSuccess(false)
@@ -66,6 +75,7 @@ export function ProfilePage() {
       setPwSuccess(true)
       setCurrentPassword('')
       setNewPassword('')
+      setConfirmPassword('')
     } catch {
       setPwError('Failed to change password. Please check your current password and try again.')
     } finally {
@@ -103,7 +113,7 @@ export function ProfilePage() {
                 className={styles.input}
                 type="text"
                 value={address.street}
-                onChange={(e) => setAddress((prev) => ({ ...prev, street: e.target.value }))}
+                onChange={(e) => { setAddressSuccess(false); setAddress((prev) => ({ ...prev, street: e.target.value })) }}
                 required
               />
             </div>
@@ -116,7 +126,7 @@ export function ProfilePage() {
                 className={styles.input}
                 type="text"
                 value={address.city}
-                onChange={(e) => setAddress((prev) => ({ ...prev, city: e.target.value }))}
+                onChange={(e) => { setAddressSuccess(false); setAddress((prev) => ({ ...prev, city: e.target.value })) }}
                 required
               />
             </div>
@@ -129,7 +139,7 @@ export function ProfilePage() {
                 className={styles.input}
                 type="text"
                 value={address.country}
-                onChange={(e) => setAddress((prev) => ({ ...prev, country: e.target.value }))}
+                onChange={(e) => { setAddressSuccess(false); setAddress((prev) => ({ ...prev, country: e.target.value })) }}
                 required
               />
             </div>
@@ -142,7 +152,7 @@ export function ProfilePage() {
                 className={styles.input}
                 type="text"
                 value={address.postal_code}
-                onChange={(e) => setAddress((prev) => ({ ...prev, postal_code: e.target.value }))}
+                onChange={(e) => { setAddressSuccess(false); setAddress((prev) => ({ ...prev, postal_code: e.target.value })) }}
                 required
               />
             </div>
@@ -176,7 +186,7 @@ export function ProfilePage() {
               className={styles.input}
               type="password"
               value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
+              onChange={(e) => { setPwSuccess(false); setCurrentPassword(e.target.value) }}
               required
             />
           </div>
@@ -189,7 +199,21 @@ export function ProfilePage() {
               className={styles.input}
               type="password"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={(e) => { setPwSuccess(false); setNewPassword(e.target.value) }}
+              required
+              minLength={8}
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="confirm_password">
+              Confirm New Password
+            </label>
+            <input
+              id="confirm_password"
+              className={styles.input}
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => { setPwSuccess(false); setConfirmPassword(e.target.value) }}
               required
               minLength={8}
             />
