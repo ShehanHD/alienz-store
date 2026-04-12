@@ -2,30 +2,30 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.middleware import MaintenanceModeMiddleware
-from api.routers import auth as auth_router
-from api.routers import setup as setup_router
-from api.routers import site_config as site_config_router
-from api.routers import categories as categories_router
-from api.routers import products as products_router
-from api.routers import images as images_router
-from api.routers import enquiries as enquiries_router
-from api.routers import account as account_router
-from api.routers import wishlist as wishlist_router
-from api.routers import admin_clients as admin_clients_router
-from api.routers import admin_dashboard as admin_dashboard_router
+from api.routers import (
+    setup as setup_router,
+    auth as auth_router,
+    site_config as site_config_router,
+    categories as categories_router,
+    products as products_router,
+    images as images_router,
+    enquiries as enquiries_router,
+    account as account_router,
+    wishlist as wishlist_router,
+    admin_clients as admin_clients_router,
+    admin_dashboard as admin_dashboard_router,
+)
 
-app = FastAPI(title="Clothing Store API")
+app = FastAPI(title="Clothing Store API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # replace with production domain before going live
+    allow_origins=["*"],  # Replace with your Hostinger domain before going live
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 app.add_middleware(MaintenanceModeMiddleware)
-
 
 app.include_router(setup_router.router)
 app.include_router(auth_router.router)
