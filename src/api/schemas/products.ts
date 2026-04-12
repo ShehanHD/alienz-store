@@ -16,7 +16,7 @@ export const ProductSchema = z.object({
   description: z.string(),
   price: z.number(),
   category_id: z.string().uuid(),
-  category: z.object({ id: z.string(), name: z.string(), slug: z.string(), sort_order: z.number() }).optional(),
+  category: z.object({ id: z.string().uuid(), name: z.string(), slug: z.string(), sort_order: z.number() }).optional(),
   sizes: z.array(z.string()),
   colors: z.array(z.string()),
   is_active: z.boolean(),
