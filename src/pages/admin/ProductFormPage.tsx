@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getAdminProducts, createProduct, updateProduct } from '../../api/admin'
+import { createProduct, updateProduct } from '../../api/admin'
+import { getApiClient } from '../../api/client'
+import { ProductSchema } from '../../api/schemas/products'
 import { getCategories } from '../../api/categories'
 import { Spinner } from '../../components/ui/Spinner'
 import type { Category, Product } from '../../types'
@@ -28,13 +30,10 @@ export function ProductFormPage() {
     if (!isEdit || !id) return
     setLoading(true)
     setLoadError(null)
-    getAdminProducts({ page: 1, page_size: 200 })
-      .then((data) => {
-        const found = data.items.find((p) => p.id === id) ?? null
-        if (!found) {
-          setLoadError('Product not found.')
-        }
-        setProduct(found)
+    getApiClient().get(`/admin/products/${id}`)
+      .then((res) => {
+        const parsed = ProductSchema.parse(res.data)
+        setProduct(parsed)
       })
       .catch(() => setLoadError('Failed to load product. Please try again.'))
       .finally(() => setLoading(false))
@@ -140,7 +139,7 @@ export function ProductFormPage() {
 
         <div className={styles.field}>
           <label htmlFor="image">Image</label>
-          <input id="image" name="image" type="file" accept="image/*" />
+          <input id="image" name="image" type="file" accept="image/*" multiple />
         </div>
 
         <div className={styles.field}>

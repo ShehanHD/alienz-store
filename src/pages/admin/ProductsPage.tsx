@@ -26,6 +26,7 @@ export function ProductsPage() {
   }, [page])
 
   async function handleDelete(id: string) {
+    if (!window.confirm('Delete this product?')) return
     setDeleteError(null)
     try {
       await deleteProduct(id)
@@ -67,10 +68,10 @@ export function ProductsPage() {
             {items.map((product) => (
               <tr key={product.id}>
                 <td>{product.name}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>€{product.price.toFixed(2)}</td>
                 <td>{product.is_active ? 'Yes' : 'No'}</td>
                 <td className={styles.actions}>
-                  <Link to={`/admin/products/${product.id}/edit`}>Edit</Link>
+                  <Link to={`/admin/products/${product.id}`}>Edit</Link>
                   <button
                     type="button"
                     onClick={() => void handleDelete(product.id)}
