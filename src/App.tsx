@@ -1,9 +1,68 @@
-function App() {
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import { RequireAuth } from './components/guards/RequireAuth'
+import { RequireAdmin } from './components/guards/RequireAdmin'
+import { RequireOwner } from './components/guards/RequireOwner'
+import { Navbar } from './components/layout/Navbar'
+import { Footer } from './components/layout/Footer'
+import { AdminLayout } from './components/layout/AdminLayout'
+import { MaintenancePage } from './pages/public/MaintenancePage'
+import { HomePage } from './pages/public/HomePage'
+import { ShopPage } from './pages/public/ShopPage'
+import { ProductDetailPage } from './pages/public/ProductDetailPage'
+import { ContactPage } from './pages/public/ContactPage'
+import { LoginPage } from './pages/auth/LoginPage'
+import { RegisterPage } from './pages/auth/RegisterPage'
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { AccountDashboardPage } from './pages/account/AccountDashboardPage'
+import { OrdersPage } from './pages/account/OrdersPage'
+import { WishlistPage } from './pages/account/WishlistPage'
+import { ProfilePage } from './pages/account/ProfilePage'
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
+import { ProductsPage } from './pages/admin/ProductsPage'
+import { ProductFormPage } from './pages/admin/ProductFormPage'
+import { CategoriesPage } from './pages/admin/CategoriesPage'
+import { EnquiriesPage } from './pages/admin/EnquiriesPage'
+import { ClientsPage } from './pages/admin/ClientsPage'
+import { SettingsPage } from './pages/admin/SettingsPage'
+
+export default function App() {
   return (
-    <div>
-      <h1>Clothing Store</h1>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/maintenance" element={<MaintenancePage />} />
+          <Route element={<><Navbar /><Footer /></>}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/shop" element={<ShopPage />} />
+            <Route path="/shop/:slug" element={<ProductDetailPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/register" element={<RegisterPage />} />
+            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+            <Route element={<RequireAuth />}>
+              <Route path="/account" element={<AccountDashboardPage />} />
+              <Route path="/account/orders" element={<OrdersPage />} />
+              <Route path="/account/wishlist" element={<WishlistPage />} />
+              <Route path="/account/profile" element={<ProfilePage />} />
+            </Route>
+          </Route>
+          <Route element={<RequireAdmin />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/products" element={<ProductsPage />} />
+              <Route path="/admin/products/new" element={<ProductFormPage />} />
+              <Route path="/admin/products/:id" element={<ProductFormPage />} />
+              <Route path="/admin/categories" element={<CategoriesPage />} />
+              <Route path="/admin/enquiries" element={<EnquiriesPage />} />
+              <Route path="/admin/clients" element={<ClientsPage />} />
+              <Route element={<RequireOwner />}>
+                <Route path="/admin/settings" element={<SettingsPage />} />
+              </Route>
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
-
-export default App
