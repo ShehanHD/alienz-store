@@ -45,7 +45,7 @@ export function OrdersPage() {
       )}
       {loading && <p>Loading…</p>}
       {!loading && !error && enquiries.length === 0 && (
-        <p className={styles.empty}>You have no enquiries yet.</p>
+        <p className={styles.empty}>No orders yet.</p>
       )}
       {!loading && enquiries.length > 0 && (
         <ul className={styles.list}>

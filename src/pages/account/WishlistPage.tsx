@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getWishlist, removeFromWishlist } from '../../api/wishlist'
+import { ProductCard } from '../../components/ui/ProductCard'
 import type { WishlistItem } from '../../types'
 import styles from './WishlistPage.module.css'
 
@@ -40,7 +41,7 @@ export function WishlistPage() {
         <ul className={styles.list}>
           {items.map((item) => (
             <li key={item.id} className={styles.item}>
-              <span>{item.product?.name ?? item.product_id}</span>
+              {item.product && <ProductCard product={item.product} />}
               <button
                 className={styles.removeBtn}
                 onClick={() => void handleRemove(item.product_id)}

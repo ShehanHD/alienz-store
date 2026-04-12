@@ -1,9 +1,11 @@
 import { type FormEvent, useEffect, useState } from 'react'
 import { getAddress, upsertAddress, changePassword } from '../../api/account'
+import { useAuth } from '../../hooks/useAuth'
 import type { Address } from '../../types'
 import styles from './ProfilePage.module.css'
 
 export function ProfilePage() {
+  const { user } = useAuth()
   // Address state
   const [address, setAddress] = useState<Omit<Address, 'id' | 'user_id' | 'is_default'>>({
     street: '',
@@ -74,6 +76,7 @@ export function ProfilePage() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Profile &amp; Address</h1>
+      <p>{user?.first_name} {user?.last_name} — {user?.email}</p>
 
       {/* Address section */}
       <section className={styles.section}>
