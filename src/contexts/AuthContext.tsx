@@ -5,6 +5,7 @@ import {
   login as doLogin,
   register as doRegister,
   logout as doLogout,
+  getMe,
 } from '../api/auth'
 import type { User } from '../types'
 
@@ -22,23 +23,24 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [accessToken, setAccessTokenState] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   // Use a ref so the token getter passed to initApiClient is always stable
   // and always reads the latest token without re-initializing the client.
   const accessTokenRef = useRef<string | null>(null)
 
-  // Keep the ref in sync with state
-  useEffect(() => {
-    accessTokenRef.current = accessToken
-  }, [accessToken])
+  // Wrapper that keeps state and ref in sync atomically
+  const setAccessToken = useCallback((token: string | null) => {
+    accessTokenRef.current = token
+    setAccessTokenState(token)
+  }, [])
 
   const refresh = useCallback(async (): Promise<string | null> => {
     const token = await doRefreshToken()
     if (token) setAccessToken(token)
     return token
-  }, [])
+  }, [setAccessToken])
 
   // Initialize the API client once with a stable getter and the refresh fn.
   // Only re-initialize if `refresh` changes (it shouldn't after mount).
@@ -48,30 +50,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // On mount, attempt to restore session via refresh token cookie
-    setIsLoading(true)
-    doRefreshToken()
-      .then((token) => {
+    const restore = async () => {
+      try {
+        const token = await doRefreshToken()
         if (token) {
           setAccessToken(token)
-          // Fetch user info after token refresh
-          import('../api/auth').then(({ getMe }) =>
-            getMe()
-              .then(setUser)
-              .catch(() => {
-                setUser(null)
-                setAccessToken(null)
-              }),
-          )
+          try {
+            const me = await getMe()
+            setUser(me)
+          } catch {
+            setUser(null)
+            setAccessToken(null)
+          }
         }
-      })
-      .finally(() => setIsLoading(false))
-  }, [])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    void restore()
+  }, [setAccessToken])
 
-  const login = useCallback(async (email: string, password: string) => {
-    const result = await doLogin(email, password)
-    setAccessToken(result.access_token)
-    setUser(result.user)
-  }, [])
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const result = await doLogin(email, password)
+      setAccessToken(result.access_token)
+      setUser(result.user)
+    },
+    [setAccessToken],
+  )
 
   const register = useCallback(
     async (email: string, password: string, firstName?: string, lastName?: string) => {
@@ -79,14 +85,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAccessToken(result.access_token)
       setUser(result.user)
     },
-    [],
+    [setAccessToken],
   )
 
   const logout = useCallback(async () => {
-    await doLogout()
+    // Clear local state first so the client is logged out even if the server call fails
     setAccessToken(null)
     setUser(null)
-  }, [])
+    try {
+      await doLogout()
+    } catch {
+      // Server-side logout failed; local state already cleared
+    }
+  }, [setAccessToken])
 
   return (
     <AuthContext.Provider value={{ user, accessToken, isLoading, login, register, logout, setAccessToken }}>
