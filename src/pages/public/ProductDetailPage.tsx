@@ -22,14 +22,25 @@ export function ProductDetailPage() {
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [enquiryError, setEnquiryError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!slug) return
+    if (!slug) {
+      setLoading(false)
+      return
+    }
     void getProduct(slug)
       .then(setProduct)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [slug])
+
+  useEffect(() => {
+    if (user) {
+      setName(`${user.first_name} ${user.last_name}`)
+      setEmail(user.email)
+    }
+  }, [user])
 
   const handleEnquiry = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,6 +49,8 @@ export function ProductDetailPage() {
     try {
       await submitEnquiry({ name, email, message, product_id: product.id })
       setSent(true)
+    } catch {
+      setEnquiryError('Failed to send enquiry. Please try again.')
     } finally {
       setSending(false)
     }
@@ -64,6 +77,7 @@ export function ProductDetailPage() {
               <label htmlFor="msg">Message</label>
               <textarea id="msg" value={message} onChange={(e) => setMessage(e.target.value)} required rows={4} />
             </div>
+            {enquiryError && <p>{enquiryError}</p>}
             <Button type="submit" loading={sending}>Send Enquiry</Button>
           </form>
         )}
