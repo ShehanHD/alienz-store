@@ -5,7 +5,7 @@ import styles from './Navbar.module.css'
 export function Navbar() {
   const { user, logout } = useAuth()
   return (
-    <nav className={styles.nav}>
+    <nav className={styles.nav} aria-label="Main navigation">
       <Link to="/" className={styles.brand}>AlienzStore</Link>
       <div className={styles.links}>
         <Link to="/shop">Shop</Link>

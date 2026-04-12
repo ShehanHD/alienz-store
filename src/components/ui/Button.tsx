@@ -12,7 +12,8 @@ export function Button({ loading = false, variant = 'primary', disabled, childre
       disabled={disabled || loading}
       className={`${styles.btn} ${styles[variant]}`}
     >
-      {loading ? <span className={styles.spinner} aria-label="Loading" /> : children}
+      {loading && <span className={styles.spinnerIcon} aria-hidden="true" />}
+      <span className={loading ? styles.srOnly : undefined}>{children}</span>
     </button>
   )
 }
