@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { getApiClient } from './client'
 import { AddressSchema } from './schemas/account'
 import { UserSchema } from './schemas/auth'
@@ -23,8 +24,9 @@ export async function getAddress(): Promise<Address | null> {
   try {
     const res = await getApiClient().get('/account/address')
     return AddressSchema.parse(res.data)
-  } catch {
-    return null
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) return null
+    throw err
   }
 }
 

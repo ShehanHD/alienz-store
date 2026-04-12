@@ -9,12 +9,15 @@ import { ProductSchema, PaginatedProductsSchema } from './schemas/products'
 import { UserSchema } from './schemas/auth'
 import type { PaginatedResponse, Product, SiteConfig, User } from '../types'
 
+interface AdminProductFilters { page?: number; page_size?: number; category?: string; search?: string; is_active?: boolean }
+interface AdminClientFilters { page?: number; page_size?: number; search?: string }
+
 export async function getDashboard(): Promise<z.infer<typeof AdminDashboardSchema>> {
   const res = await getApiClient().get('/admin/dashboard')
   return AdminDashboardSchema.parse(res.data)
 }
 
-export async function getAdminProducts(params: Record<string, unknown> = {}): Promise<PaginatedResponse<Product>> {
+export async function getAdminProducts(params: AdminProductFilters = {}): Promise<PaginatedResponse<Product>> {
   const res = await getApiClient().get('/admin/products', { params })
   return PaginatedProductsSchema.parse(res.data)
 }
@@ -38,7 +41,7 @@ export async function deleteProduct(id: string): Promise<void> {
 }
 
 export async function getClients(
-  params: Record<string, unknown> = {},
+  params: AdminClientFilters = {},
 ): Promise<PaginatedResponse<User>> {
   const res = await getApiClient().get('/admin/clients', { params })
   return PaginatedAdminUsersSchema.parse(res.data)
