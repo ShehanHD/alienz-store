@@ -1,3 +1,44 @@
+import { useState } from 'react'
+import { submitEnquiry } from '../../api/enquiries'
+import { Button } from '../../components/ui/Button'
+import { Input } from '../../components/ui/Input'
+import styles from './ContactPage.module.css'
+
 export function ContactPage() {
-  return <div>ContactPage</div>
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      await submitEnquiry({ name, email, message })
+      setSent(true)
+    } catch {
+      setError('Failed to send. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (sent) return <p className={styles.success}>Thanks! We'll be in touch.</p>
+
+  return (
+    <form onSubmit={(e) => void handleSubmit(e)} className={styles.form}>
+      <h1>Contact Us</h1>
+      <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+      <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <div className={styles.field}>
+        <label htmlFor="message">Message</label>
+        <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} required rows={5} />
+      </div>
+      {error && <p className={styles.error}>{error}</p>}
+      <Button type="submit" loading={loading}>Send</Button>
+    </form>
+  )
 }
