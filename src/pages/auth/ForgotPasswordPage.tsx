@@ -1,6 +1,9 @@
+// TODO: This is a stub page. Implement password reset flow (send reset email, handle token) when backend supports it.
+import styles from './ForgotPasswordPage.module.css'
+
 export function ForgotPasswordPage() {
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <div className={styles.container}>
       <h1>Password Reset</h1>
       <p>Please contact the store to reset your password.</p>
     </div>

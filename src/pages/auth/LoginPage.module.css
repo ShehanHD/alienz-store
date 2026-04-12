@@ -1,2 +1,4 @@
 .form {}
-.error {}
+.error {
+  color: #c0392b;
+}
