@@ -1,3 +1,4 @@
+import styles from './Spinner.module.css'
 export function Spinner() {
-  return <div data-testid="spinner" />
+  return <div className={styles.spinner} aria-label="Loading" role="status" data-testid="spinner" />
 }

@@ -1,0 +1,14 @@
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f6;
+  --bg-card: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --accent: #2c2c2c;
+  --accent-hover: #444444;
+  --border: #e5e5e5;
+  --error: #c0392b;
+  --success: #27ae60;
+  --radius: 6px;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
