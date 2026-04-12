@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getCategories, createCategory, deleteCategory } from '../../api/categories'
 import { Spinner } from '../../components/ui/Spinner'
 import type { Category } from '../../types'
@@ -14,18 +14,18 @@ export function CategoriesPage() {
   const [newSortOrder, setNewSortOrder] = useState(0)
   const [submitting, setSubmitting] = useState(false)
 
-  function load() {
+  const load = useCallback(() => {
     setLoading(true)
     setLoadError(null)
     getCategories()
       .then(setCategories)
       .catch(() => setLoadError('Failed to load categories. Please try again.'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()

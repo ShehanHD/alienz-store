@@ -44,6 +44,7 @@ export function AdminDashboardPage() {
         <div className={styles.card}>
           <h2>Storage</h2>
           <p className={styles.sub}>Quota: {data.storage.quota_mb} MB</p>
+          {/* TODO: storage used_mb not yet returned by API */}
           <p className={styles.sub}>Used: N/A</p>
         </div>
       </div>

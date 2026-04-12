@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getAdminEnquiries, updateEnquiryStatus } from '../../api/enquiries'
+import { EnquiryStatusSchema } from '../../api/schemas/enquiries'
 import { Spinner } from '../../components/ui/Spinner'
-import type { Enquiry, PaginatedResponse, EnquiryStatus } from '../../types'
+import type { Enquiry, EnquiryStatus, PaginatedResponse } from '../../types'
 import styles from './EnquiriesPage.module.css'
 
 const STATUS_OPTIONS: EnquiryStatus[] = ['new', 'read', 'replied']
@@ -14,20 +15,21 @@ export function EnquiriesPage() {
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
 
-  function load(p: number, status: string) {
+  const load = useCallback((p: number, status: string) => {
     setLoading(true)
     setLoadError(null)
     getAdminEnquiries({ page: p, ...(status ? { status } : {}) })
       .then(setData)
       .catch(() => setLoadError('Failed to load enquiries. Please try again.'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
   useEffect(() => {
     load(page, statusFilter)
-  }, [page, statusFilter])
+  }, [page, statusFilter, load])
 
-  async function handleStatusChange(id: string, status: string) {
+  async function handleStatusChange(id: string, rawStatus: string) {
+    const status = EnquiryStatusSchema.parse(rawStatus)
     setUpdateError(null)
     try {
       const updated = await updateEnquiryStatus(id, status)
@@ -90,6 +92,7 @@ export function EnquiriesPage() {
                 <td>
                   <select
                     value={enq.status}
+                    aria-label={`Status for enquiry from ${enq.name}`}
                     onChange={(e) => void handleStatusChange(enq.id, e.target.value)}
                   >
                     {STATUS_OPTIONS.map((s) => (

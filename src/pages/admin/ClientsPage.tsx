@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getClients, toggleClientActive, promoteToAdmin } from '../../api/admin'
 import { Spinner } from '../../components/ui/Spinner'
 import type { PaginatedResponse, User } from '../../types'
@@ -13,18 +13,18 @@ export function ClientsPage() {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
 
-  function load(p: number, s: string) {
+  const load = useCallback((p: number, s: string) => {
     setLoading(true)
     setLoadError(null)
     getClients({ page: p, page_size: 20, ...(s ? { search: s } : {}) })
       .then(setData)
       .catch(() => setLoadError('Failed to load clients. Please try again.'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
   useEffect(() => {
     load(page, search)
-  }, [page, search])
+  }, [page, search, load])
 
   async function handleToggleActive(id: string, currentlyActive: boolean) {
     setActionError(null)
