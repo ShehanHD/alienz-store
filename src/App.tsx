@@ -3,8 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { RequireAuth } from './components/guards/RequireAuth'
 import { RequireAdmin } from './components/guards/RequireAdmin'
 import { RequireOwner } from './components/guards/RequireOwner'
-import { Navbar } from './components/layout/Navbar'
-import { Footer } from './components/layout/Footer'
+import { PublicLayout } from './components/layout/PublicLayout'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { MaintenancePage } from './pages/public/MaintenancePage'
 import { HomePage } from './pages/public/HomePage'
@@ -32,7 +31,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/maintenance" element={<MaintenancePage />} />
-          <Route element={<><Navbar /><Footer /></>}>
+          <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/shop" element={<ShopPage />} />
             <Route path="/shop/:slug" element={<ProductDetailPage />} />
