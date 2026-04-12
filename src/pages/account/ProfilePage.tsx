@@ -7,11 +7,12 @@ import styles from './ProfilePage.module.css'
 export function ProfilePage() {
   const { user } = useAuth()
   // Address state
-  const [address, setAddress] = useState<Omit<Address, 'id' | 'user_id' | 'is_default'>>({
+  const [address, setAddress] = useState<Omit<Address, 'id' | 'user_id'>>({
     street: '',
     city: '',
     country: '',
     postal_code: '',
+    is_default: false,
   })
   const [addressLoading, setAddressLoading] = useState(true)
   const [addressError, setAddressError] = useState<string | null>(null)
@@ -35,6 +36,7 @@ export function ProfilePage() {
             city: data.city,
             country: data.country,
             postal_code: data.postal_code,
+            is_default: data.is_default,
           })
         }
       })

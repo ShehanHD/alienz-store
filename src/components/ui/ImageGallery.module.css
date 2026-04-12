@@ -1,1 +1,34 @@
-/* ImageGallery styles — to be implemented */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.main {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.thumbs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.thumb {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+  overflow: hidden;
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb.active {
+  border-color: #111;
+}

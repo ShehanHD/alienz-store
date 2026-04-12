@@ -1,1 +1,33 @@
-/* Navbar styles — to be implemented */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #111;
+}
+.links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.logoutBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #555;
+  padding: 0;
+}
+.logoutBtn:hover {
+  color: #111;
+}

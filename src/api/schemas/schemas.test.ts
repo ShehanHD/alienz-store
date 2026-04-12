@@ -1,7 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { UserSchema, TokenResponseSchema } from './auth'
-import { ProductSchema } from './products'
-import { CategorySchema } from './categories'
+import { UserSchema } from './auth'
 import { AdminDashboardSchema } from './admin'
 
 describe('Schemas', () => {

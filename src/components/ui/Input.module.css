@@ -1,1 +1,29 @@
-/* Input styles — to be implemented */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+}
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.input:focus {
+  outline: none;
+  border-color: #111;
+}
+.hasError {
+  border-color: #c0392b;
+}
+.error {
+  font-size: 0.75rem;
+  color: #c0392b;
+}
