@@ -1,0 +1,9 @@
+{"type":"server-started","port":57098,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:57098","screen_dir":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content","state_dir":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/state"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/welcome.html"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/approaches.html"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/architecture.html"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/architecture-final.html"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/config-panel.html"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/pages-routes.html"}
+{"type":"screen-added","file":"/Users/don/Desktop/alienz/.superpowers/brainstorm/7467-1775833889/content/data-model.html"}
+{"type":"server-stopped","reason":"idle timeout"}

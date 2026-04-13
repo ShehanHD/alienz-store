@@ -1,0 +1,90 @@
+<h2>Admin Config Panel</h2>
+<p class="subtitle">All limits stored in a <code>site_config</code> DB table — editable from admin, enforced by FastAPI</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Settings → Limits & Controls</div>
+    <div class="mockup-body" style="padding:20px;font-size:13px">
+
+      <div style="margin-bottom:20px">
+        <div class="label" style="margin-bottom:10px">Catalog</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Max Products</div>
+            <div style="color:var(--muted,#888);font-size:12px">Total items allowed in store</div>
+            <input class="mock-input" value="15" style="width:80px;margin-top:6px">
+          </div>
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Max Images per Product</div>
+            <div style="color:var(--muted,#888);font-size:12px">Across all variants</div>
+            <input class="mock-input" value="6" style="width:80px;margin-top:6px">
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="label" style="margin-bottom:10px">Storage & Uploads</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Storage Quota</div>
+            <div style="color:var(--muted,#888);font-size:12px">Total Supabase Storage cap</div>
+            <input class="mock-input" value="10240" style="width:90px;margin-top:6px"> <span style="font-size:11px">MB</span>
+          </div>
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Max Upload Size</div>
+            <div style="color:var(--muted,#888);font-size:12px">Per image before optimisation</div>
+            <input class="mock-input" value="10" style="width:60px;margin-top:6px"> <span style="font-size:11px">MB</span>
+          </div>
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Output Max Width</div>
+            <div style="color:var(--muted,#888);font-size:12px">After Pillow resize (WebP)</div>
+            <input class="mock-input" value="1200" style="width:80px;margin-top:6px"> <span style="font-size:11px">px</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="label" style="margin-bottom:10px">Store</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Enquiry Email</div>
+            <div style="color:var(--muted,#888);font-size:12px">Where order/enquiry emails go</div>
+            <input class="mock-input" value="store@example.com" style="width:180px;margin-top:6px">
+          </div>
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Maintenance Mode</div>
+            <div style="color:var(--muted,#888);font-size:12px">Blocks public access</div>
+            <div style="margin-top:8px">
+              <button class="mock-button" style="font-size:11px;background:#e5e7eb;color:#374151">OFF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="label" style="margin-bottom:10px">Clients</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Max Wishlist Items</div>
+            <div style="color:var(--muted,#888);font-size:12px">Per client account</div>
+            <input class="mock-input" value="50" style="width:80px;margin-top:6px">
+          </div>
+          <div style="background:var(--surface,#f0f0f0);padding:12px;border-radius:6px">
+            <div style="font-weight:600">Allow New Registrations</div>
+            <div style="color:var(--muted,#888);font-size:12px">Toggle client sign-ups</div>
+            <div style="margin-top:8px">
+              <button class="mock-button" style="font-size:11px">ON</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fef9c3;border-radius:6px;padding:12px;font-size:12px;color:#713f12">
+        <strong>Storage usage bar</strong> — FastAPI tracks total bytes used across all uploads and compares against the quota. Admin sees a live usage indicator here. Upload is blocked if quota is exceeded.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<p class="subtitle">Does this cover everything you need? Reply in the terminal.</p>

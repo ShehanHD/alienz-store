@@ -1,0 +1,61 @@
+<h2>System Architecture</h2>
+<p class="subtitle">How the pieces fit together</p>
+
+<div class="section">
+  <h3>Stack Overview</h3>
+  <div class="mockup">
+    <div class="mockup-header">Full Stack</div>
+    <div class="mockup-body" style="font-family:monospace;font-size:13px;line-height:2">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;padding:16px">
+
+        <div style="background:var(--surface,#f5f5f5);border-radius:8px;padding:16px">
+          <div style="font-size:22px;margin-bottom:6px">🖥️</div>
+          <div style="font-weight:700;margin-bottom:4px">Frontend</div>
+          <div style="color:var(--muted,#888);font-size:12px">React + Vite + TypeScript</div>
+          <div style="margin-top:8px;font-size:11px;background:#e0e7ff;border-radius:4px;padding:4px 8px;display:inline-block">Hostinger (static)</div>
+        </div>
+
+        <div style="background:var(--surface,#f5f5f5);border-radius:8px;padding:16px">
+          <div style="font-size:22px;margin-bottom:6px">⚙️</div>
+          <div style="font-weight:700;margin-bottom:4px">Backend</div>
+          <div style="color:var(--muted,#888);font-size:12px">FastAPI + Python</div>
+          <div style="margin-top:8px;font-size:11px;background:#e0e7ff;border-radius:4px;padding:4px 8px;display:inline-block">Railway (recommended)</div>
+        </div>
+
+        <div style="background:var(--surface,#f5f5f5);border-radius:8px;padding:16px">
+          <div style="font-size:22px;margin-bottom:6px">🗄️</div>
+          <div style="font-weight:700;margin-bottom:4px">Database + Auth</div>
+          <div style="color:var(--muted,#888);font-size:12px">Supabase (PostgreSQL)</div>
+          <div style="margin-top:8px;font-size:11px;background:#e0e7ff;border-radius:4px;padding:4px 8px;display:inline-block">New project (free tier)</div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;color:var(--muted,#888);font-size:12px;padding:8px">
+        React ↔ FastAPI (REST) ↔ Supabase (PostgreSQL)<br>
+        React ↔ Supabase Auth (login / session tokens)
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Why Railway over Vercel for FastAPI?</h3>
+  <ul>
+    <li>Vercel runs Python as short-lived serverless functions — 10s timeout, cold starts, no persistent connections</li>
+    <li>Railway runs FastAPI as a real persistent server — better for DB connections, background tasks, future payments</li>
+    <li>Railway free tier: $5 credit/month (enough for a small app)</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>Auth Flow</h3>
+  <ul>
+    <li>Supabase Auth handles sign-up, login, password reset, sessions</li>
+    <li>Frontend gets a JWT from Supabase on login</li>
+    <li>FastAPI validates the JWT on protected routes (no custom auth code needed)</li>
+    <li>Admin role = a flag on the user record in Supabase</li>
+  </ul>
+</div>
+
+<p class="subtitle">Does this architecture look right? Reply in terminal.</p>

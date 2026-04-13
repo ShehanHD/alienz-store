@@ -1,0 +1,103 @@
+<h2>Pages & Routes</h2>
+<p class="subtitle">Section 2 of 3 — Every page in the app, grouped by area</p>
+
+<div class="section">
+  <h3>Public (no login required)</h3>
+  <div class="mockup">
+    <div class="mockup-header">/ — Public routes</div>
+    <div class="mockup-body" style="font-size:13px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Route</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Page</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/</td><td style="padding:8px 12px">Home</td><td style="padding:8px 12px;color:var(--text-secondary)">Hero, featured products, about snippet</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/shop</td><td style="padding:8px 12px">Product Listing</td><td style="padding:8px 12px;color:var(--text-secondary)">Filter by category, grid view, pagination</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/shop/:slug</td><td style="padding:8px 12px">Product Detail</td><td style="padding:8px 12px;color:var(--text-secondary)">Images, sizes, colors, enquiry button</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/contact</td><td style="padding:8px 12px">Contact / Enquire</td><td style="padding:8px 12px;color:var(--text-secondary)">General enquiry form → email</td></tr>
+          <tr><td style="padding:8px 12px;font-family:monospace">/maintenance</td><td style="padding:8px 12px">Maintenance</td><td style="padding:8px 12px;color:var(--text-secondary)">Shown when maintenance mode is ON</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Auth</h3>
+  <div class="mockup">
+    <div class="mockup-header">/auth — Login & registration</div>
+    <div class="mockup-body" style="font-size:13px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Route</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/auth/login</td><td style="padding:8px 12px">Login</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/auth/register</td><td style="padding:8px 12px">Register (toggled by config)</td></tr>
+          <tr><td style="padding:8px 12px;font-family:monospace">/auth/forgot-password</td><td style="padding:8px 12px">Password Reset</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Client Area (login required, role: client)</h3>
+  <div class="mockup">
+    <div class="mockup-header">/account — Protected client routes</div>
+    <div class="mockup-body" style="font-size:13px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Route</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Page</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/account</td><td style="padding:8px 12px">Dashboard</td><td style="padding:8px 12px;color:var(--text-secondary)">Overview, quick links</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/account/orders</td><td style="padding:8px 12px">Order History</td><td style="padding:8px 12px;color:var(--text-secondary)">List of past enquiries/orders</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/account/wishlist</td><td style="padding:8px 12px">Wishlist</td><td style="padding:8px 12px;color:var(--text-secondary)">Saved items, capped by config</td></tr>
+          <tr><td style="padding:8px 12px;font-family:monospace">/account/profile</td><td style="padding:8px 12px">Profile & Address</td><td style="padding:8px 12px;color:var(--text-secondary)">Name, email, address, change password</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Admin Area (login required, role: admin)</h3>
+  <div class="mockup">
+    <div class="mockup-header">/admin — Protected admin routes</div>
+    <div class="mockup-body" style="font-size:13px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Route</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Page</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--text-secondary);font-weight:500">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin</td><td style="padding:8px 12px">Dashboard</td><td style="padding:8px 12px;color:var(--text-secondary)">Stats: products, enquiries, storage usage</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin/products</td><td style="padding:8px 12px">Products</td><td style="padding:8px 12px;color:var(--text-secondary)">List, add, edit, delete</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin/products/new</td><td style="padding:8px 12px">Add Product</td><td style="padding:8px 12px;color:var(--text-secondary)">Form with image upload</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin/products/:id</td><td style="padding:8px 12px">Edit Product</td><td style="padding:8px 12px;color:var(--text-secondary)">Same form, pre-filled</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin/categories</td><td style="padding:8px 12px">Categories</td><td style="padding:8px 12px;color:var(--text-secondary)">Add, rename, delete</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin/enquiries</td><td style="padding:8px 12px">Enquiries</td><td style="padding:8px 12px;color:var(--text-secondary)">View all orders/enquiries, status</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-family:monospace">/admin/clients</td><td style="padding:8px 12px">Client Accounts</td><td style="padding:8px 12px;color:var(--text-secondary)">View, disable, delete</td></tr>
+          <tr><td style="padding:8px 12px;font-family:monospace">/admin/settings</td><td style="padding:8px 12px">Settings</td><td style="padding:8px 12px;color:var(--text-secondary)">All config limits (from Section 1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle">Anything missing or to rename? Reply in the terminal.</p>

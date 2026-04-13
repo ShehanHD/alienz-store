@@ -58,17 +58,18 @@ It only works once — subsequent calls return an error if an owner already exis
 
 ## Step 4 — Build & Deploy Frontend to Hostinger
 
-1. Update `VITE_API_URL` in `.worktrees/frontend/.env.production` to your actual Vercel URL:
+1. Update `VITE_API_URL` in `frontend/.env.production` to your actual Vercel URL:
    ```
    VITE_API_URL=https://alienz-store.vercel.app
    ```
 
 2. Build the frontend:
    ```bash
-   cd .worktrees/frontend
+   cd frontend
+   npm install
    npm run build
    ```
-   Output goes to `.worktrees/frontend/dist/`
+   Output goes to `frontend/dist/`
 
 3. Upload the **contents** of `dist/` to your Hostinger `public_html/` via File Manager or FTP.
    - The `.htaccess` file inside `dist/public/` must also be uploaded — it handles SPA routing.
