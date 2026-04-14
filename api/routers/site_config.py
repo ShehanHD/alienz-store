@@ -15,27 +15,37 @@ VALID_KEYS = {
 @router.get("")
 def get_settings(conn=Depends(get_db), _=Depends(require_owner)):
     with conn.cursor() as cur:
-        cur.execute("SELECT key, value FROM site_config ORDER BY key")
+        cur.execute("SELECT key, value, updated_at FROM site_config ORDER BY key")
         rows = cur.fetchall()
-    return {row["key"]: row["value"] for row in rows}
+    return [
+        {"key": row["key"], "value": row["value"], "updated_at": row["updated_at"].isoformat()}
+        for row in rows
+    ]
 
 
-@router.put("")
-def update_settings(
-    updates: dict[str, str],
+@router.put("/{key}")
+def update_setting(
+    key: str,
+    body: dict,
     conn=Depends(get_db),
     _=Depends(require_owner),
 ):
-    invalid = set(updates.keys()) - VALID_KEYS
-    if invalid:
-        raise HTTPException(status_code=422, detail=f"Unknown config keys: {sorted(invalid)}")
+    if key not in VALID_KEYS:
+        raise HTTPException(status_code=422, detail=f"Unknown config key: {key}")
+
+    value = body.get("value")
+    if value is None:
+        raise HTTPException(status_code=422, detail="Missing field: value")
 
     with conn.cursor() as cur:
-        for key, value in updates.items():
-            cur.execute(
-                "UPDATE site_config SET value = %s, updated_at = NOW() WHERE key = %s",
-                (str(value), key),
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=422, detail=f"Config key not found: {key}")
-    return {"detail": "Config updated"}
+        cur.execute(
+            "UPDATE site_config SET value = %s, updated_at = NOW() WHERE key = %s "
+            "RETURNING key, value, updated_at",
+            (str(value), key),
+        )
+        row = cur.fetchone()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail=f"Config key not found: {key}")
+
+    return {"key": row["key"], "value": row["value"], "updated_at": row["updated_at"].isoformat()}
