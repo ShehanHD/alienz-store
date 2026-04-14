@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 
 from api.db import get_db
 from api.dependencies import require_owner
+
+
+class UpdateSettingRequest(BaseModel):
+    value: str
 
 router = APIRouter(prefix="/admin/settings", tags=["site_config"])
 
@@ -26,22 +31,18 @@ def get_settings(conn=Depends(get_db), _=Depends(require_owner)):
 @router.put("/{key}")
 def update_setting(
     key: str,
-    body: dict,
+    body: UpdateSettingRequest,
     conn=Depends(get_db),
     _=Depends(require_owner),
 ):
     if key not in VALID_KEYS:
         raise HTTPException(status_code=422, detail=f"Unknown config key: {key}")
 
-    value = body.get("value")
-    if value is None:
-        raise HTTPException(status_code=422, detail="Missing field: value")
-
     with conn.cursor() as cur:
         cur.execute(
             "UPDATE site_config SET value = %s, updated_at = NOW() WHERE key = %s "
             "RETURNING key, value, updated_at",
-            (str(value), key),
+            (body.value, key),
         )
         row = cur.fetchone()
 

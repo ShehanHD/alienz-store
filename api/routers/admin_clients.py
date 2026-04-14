@@ -10,18 +10,35 @@ router = APIRouter(prefix="/admin/clients", tags=["admin_clients"])
 def list_clients(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    search: str = Query(None),
     conn=Depends(get_db),
     _=Depends(require_admin),
 ):
     offset = (page - 1) * page_size
     with conn.cursor() as cur:
-        cur.execute(
-            "SELECT id, email, role, first_name, last_name, is_active, created_at "
-            "FROM users WHERE role != 'owner' ORDER BY created_at DESC LIMIT %s OFFSET %s",
-            (page_size, offset),
-        )
-        items = [dict(r) for r in cur.fetchall()]
-        cur.execute("SELECT COUNT(*) AS total FROM users WHERE role != 'owner'")
+        if search:
+            pattern = f"%{search}%"
+            cur.execute(
+                "SELECT id, email, role, first_name, last_name, is_active, created_at "
+                "FROM users WHERE role != 'owner' "
+                "AND (first_name ILIKE %s OR last_name ILIKE %s OR email ILIKE %s) "
+                "ORDER BY created_at DESC LIMIT %s OFFSET %s",
+                (pattern, pattern, pattern, page_size, offset),
+            )
+            items = [dict(r) for r in cur.fetchall()]
+            cur.execute(
+                "SELECT COUNT(*) AS total FROM users WHERE role != 'owner' "
+                "AND (first_name ILIKE %s OR last_name ILIKE %s OR email ILIKE %s)",
+                (pattern, pattern, pattern),
+            )
+        else:
+            cur.execute(
+                "SELECT id, email, role, first_name, last_name, is_active, created_at "
+                "FROM users WHERE role != 'owner' ORDER BY created_at DESC LIMIT %s OFFSET %s",
+                (page_size, offset),
+            )
+            items = [dict(r) for r in cur.fetchall()]
+            cur.execute("SELECT COUNT(*) AS total FROM users WHERE role != 'owner'")
         total = cur.fetchone()["total"]
     return {"items": items, "total": total, "page": page, "page_size": page_size}
 
@@ -54,7 +71,7 @@ def enable_client(user_id: str, conn=Depends(get_db), _=Depends(require_admin)):
     return dict(row)
 
 
-@router.put("/{user_id}/promote")
+@router.post("/{user_id}/promote")
 def promote_to_admin(user_id: str, conn=Depends(get_db), _=Depends(require_owner)):
     with conn.cursor() as cur:
         cur.execute("SELECT role FROM users WHERE id = %s", (user_id,))
