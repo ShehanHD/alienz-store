@@ -127,4 +127,7 @@ it('does not render empty attribute groups', async () => {
   await waitFor(() => expect(screen.getByText('Blue Dress')).toBeInTheDocument())
   expect(screen.queryByText('Category')).not.toBeInTheDocument()
   expect(screen.queryByText('Materials')).not.toBeInTheDocument()
+  expect(screen.queryByText('Fits')).not.toBeInTheDocument()
+  expect(screen.queryByText('Models')).not.toBeInTheDocument()
+  expect(screen.queryByText('Style')).not.toBeInTheDocument()
 })
