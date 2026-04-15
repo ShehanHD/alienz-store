@@ -30,6 +30,8 @@ export function ProductDetailPage() {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [enquiryError, setEnquiryError] = useState<string | null>(null)
+  const [descOpen, setDescOpen] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   useEffect(() => {
     if (!slug) { setLoading(false); return }
@@ -96,61 +98,6 @@ export function ProductDetailPage() {
       <div className={styles.info}>
         <h1>{product.name}</h1>
         <p className={styles.price}>€{product.price.toFixed(2)}</p>
-        {product.description && <p className={styles.description}>{product.description}</p>}
-
-        {/* Product attributes */}
-        {(product.category || product.materials.length > 0 || product.fits.length > 0 || product.models.length > 0 || product.accessory_styles.length > 0) && (
-          <div className={styles.attributes}>
-            {product.category && (
-              <div className={styles.selectorField}>
-                <span className={styles.selectorLabel}>Category</span>
-                <div className={styles.chips}>
-                  <span className={styles.chipStatic}>{product.category.name}</span>
-                </div>
-              </div>
-            )}
-            {product.materials.length > 0 && (
-              <div className={styles.selectorField}>
-                <span className={styles.selectorLabel}>Materials</span>
-                <div className={styles.chips}>
-                  {product.materials.map((m) => (
-                    <span key={m} className={styles.chipStatic}>{m}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {product.fits.length > 0 && (
-              <div className={styles.selectorField}>
-                <span className={styles.selectorLabel}>Fits</span>
-                <div className={styles.chips}>
-                  {product.fits.map((f) => (
-                    <span key={f} className={styles.chipStatic}>{f}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {product.models.length > 0 && (
-              <div className={styles.selectorField}>
-                <span className={styles.selectorLabel}>Models</span>
-                <div className={styles.chips}>
-                  {product.models.map((m) => (
-                    <span key={m} className={styles.chipStatic}>{m}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {product.accessory_styles.length > 0 && (
-              <div className={styles.selectorField}>
-                <span className={styles.selectorLabel}>Style</span>
-                <div className={styles.chips}>
-                  {product.accessory_styles.map((s) => (
-                    <span key={s} className={styles.chipStatic}>{s}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {!sent && (
           <form onSubmit={(e) => void handleEnquiry(e)} className={styles.enquiry}>
@@ -230,6 +177,91 @@ export function ProductDetailPage() {
         )}
 
         {sent && <p className={styles.sentMessage}>Enquiry sent! We&apos;ll be in touch.</p>}
+
+        {/* Accordion */}
+        <div className={styles.accordion}>
+          {product.description && (
+            <div className={styles.accordionItem}>
+              <button
+                type="button"
+                className={styles.accordionHeader}
+                onClick={() => setDescOpen((o) => !o)}
+                aria-expanded={descOpen}
+              >
+                <span>Product Description</span>
+                <span className={styles.accordionChevron} aria-hidden="true">{descOpen ? '−' : '+'}</span>
+              </button>
+              <div className={descOpen ? styles.accordionBody : styles.accordionBodyHidden}>
+                <p className={styles.description}>{product.description}</p>
+              </div>
+            </div>
+          )}
+          {(product.category || product.materials.length > 0 || product.fits.length > 0 || product.models.length > 0 || product.accessory_styles.length > 0) && (
+            <div className={styles.accordionItem}>
+              <button
+                type="button"
+                className={styles.accordionHeader}
+                onClick={() => setDetailsOpen((o) => !o)}
+                aria-expanded={detailsOpen}
+              >
+                <span>Product Details</span>
+                <span className={styles.accordionChevron} aria-hidden="true">{detailsOpen ? '−' : '+'}</span>
+              </button>
+              <div className={detailsOpen ? styles.accordionBody : styles.accordionBodyHidden}>
+                <div className={styles.attributes}>
+                  {product.category && (
+                    <div className={styles.selectorField}>
+                      <span className={styles.selectorLabel}>Category</span>
+                      <div className={styles.chips}>
+                        <span className={styles.chipStatic}>{product.category.name}</span>
+                      </div>
+                    </div>
+                  )}
+                  {product.materials.length > 0 && (
+                    <div className={styles.selectorField}>
+                      <span className={styles.selectorLabel}>Materials</span>
+                      <div className={styles.chips}>
+                        {product.materials.map((m) => (
+                          <span key={m} className={styles.chipStatic}>{m}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {product.fits.length > 0 && (
+                    <div className={styles.selectorField}>
+                      <span className={styles.selectorLabel}>Fits</span>
+                      <div className={styles.chips}>
+                        {product.fits.map((f) => (
+                          <span key={f} className={styles.chipStatic}>{f}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {product.models.length > 0 && (
+                    <div className={styles.selectorField}>
+                      <span className={styles.selectorLabel}>Models</span>
+                      <div className={styles.chips}>
+                        {product.models.map((m) => (
+                          <span key={m} className={styles.chipStatic}>{m}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {product.accessory_styles.length > 0 && (
+                    <div className={styles.selectorField}>
+                      <span className={styles.selectorLabel}>Style</span>
+                      <div className={styles.chips}>
+                        {product.accessory_styles.map((s) => (
+                          <span key={s} className={styles.chipStatic}>{s}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
