@@ -46,13 +46,6 @@
   color: var(--text-secondary);
 }
 
-.description {
-  font-size: 0.9375rem;
-  font-weight: 300;
-  line-height: 1.8;
-  color: var(--text-secondary);
-}
-
 .enquiry {
   display: flex;
   flex-direction: column;
