@@ -185,6 +185,12 @@
   padding: var(--space-4) 0;
 }
 
+.attributes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 .chipStatic {
   display: inline-block;
   border: 1px solid var(--border-dark);
