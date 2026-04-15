@@ -36,6 +36,7 @@ export function Footer() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSent(false)
     setLoading(true)
     setError('')
     try {
@@ -101,6 +102,7 @@ export function Footer() {
             className={styles.input}
             type="text"
             placeholder="Name"
+            aria-label="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -109,6 +111,7 @@ export function Footer() {
             className={styles.input}
             type="email"
             placeholder="Email"
+            aria-label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -116,6 +119,7 @@ export function Footer() {
           <textarea
             className={styles.textarea}
             placeholder="Message"
+            aria-label="Message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
