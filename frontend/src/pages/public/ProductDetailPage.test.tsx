@@ -54,7 +54,10 @@ it('shows category chip', async () => {
       <Routes><Route path="/shop/:slug" element={<ProductDetailPage />} /></Routes>
     </MemoryRouter>
   )
-  await waitFor(() => expect(screen.getByText('Dresses')).toBeInTheDocument())
+  await waitFor(() => {
+    expect(screen.getByText('Category')).toBeInTheDocument()
+    expect(screen.getByText('Dresses')).toBeInTheDocument()
+  })
 })
 
 it('shows materials chips', async () => {
@@ -63,8 +66,11 @@ it('shows materials chips', async () => {
       <Routes><Route path="/shop/:slug" element={<ProductDetailPage />} /></Routes>
     </MemoryRouter>
   )
-  await waitFor(() => expect(screen.getByText('Cotton')).toBeInTheDocument())
-  expect(screen.getByText('Linen')).toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.getByText('Materials')).toBeInTheDocument()
+    expect(screen.getByText('Cotton')).toBeInTheDocument()
+    expect(screen.getByText('Linen')).toBeInTheDocument()
+  })
 })
 
 it('shows fits chips', async () => {
@@ -73,7 +79,10 @@ it('shows fits chips', async () => {
       <Routes><Route path="/shop/:slug" element={<ProductDetailPage />} /></Routes>
     </MemoryRouter>
   )
-  await waitFor(() => expect(screen.getByText('Slim')).toBeInTheDocument())
+  await waitFor(() => {
+    expect(screen.getByText('Fits')).toBeInTheDocument()
+    expect(screen.getByText('Slim')).toBeInTheDocument()
+  })
 })
 
 it('shows models chips', async () => {
@@ -82,7 +91,10 @@ it('shows models chips', async () => {
       <Routes><Route path="/shop/:slug" element={<ProductDetailPage />} /></Routes>
     </MemoryRouter>
   )
-  await waitFor(() => expect(screen.getByText('Regular')).toBeInTheDocument())
+  await waitFor(() => {
+    expect(screen.getByText('Models')).toBeInTheDocument()
+    expect(screen.getByText('Regular')).toBeInTheDocument()
+  })
 })
 
 it('shows accessory_styles chips', async () => {
@@ -91,7 +103,10 @@ it('shows accessory_styles chips', async () => {
       <Routes><Route path="/shop/:slug" element={<ProductDetailPage />} /></Routes>
     </MemoryRouter>
   )
-  await waitFor(() => expect(screen.getByText('Casual')).toBeInTheDocument())
+  await waitFor(() => {
+    expect(screen.getByText('Style')).toBeInTheDocument()
+    expect(screen.getByText('Casual')).toBeInTheDocument()
+  })
 })
 
 it('does not render empty attribute groups', async () => {
