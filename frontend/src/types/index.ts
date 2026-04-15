@@ -8,6 +8,7 @@ export interface User {
   role: Role
   first_name: string
   last_name: string
+  phone: string
   is_active: boolean
   created_at: string
 }
@@ -27,6 +28,17 @@ export interface Category {
   name: string
   slug: string
   sort_order: number
+  show_in_navbar: boolean
+}
+
+export interface Collaborator {
+  id: string
+  name: string
+  instagram_url: string
+  image_url: string | null
+  is_featured: boolean
+  display_order: number
+  created_at: string
 }
 
 export interface ProductImage {
@@ -44,11 +56,17 @@ export interface Product {
   slug: string
   description: string
   price: number
-  category_id: string
+  category_id: string | null
+  category_ids: string[]
   category?: Category
   sizes: string[]
   colors: string[]
+  models: string[]
+  fits: string[]
+  materials: string[]
+  accessory_styles: string[]
   is_active: boolean
+  is_featured: boolean
   images: ProductImage[]
   created_at: string
   updated_at: string
@@ -68,7 +86,10 @@ export interface Enquiry {
   product_id: string | null
   name: string
   email: string
+  phone: string
   message: string
+  size: string
+  color: string
   status: EnquiryStatus
   created_at: string
 }
