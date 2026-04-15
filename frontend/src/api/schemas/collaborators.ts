@@ -8,6 +8,6 @@ export const CollaboratorSchema = z.object({
   is_featured: z.boolean(),
   display_order: z.number(),
   created_at: z.string(),
-})
+}).passthrough()
 
 export const CollaboratorsListSchema = z.array(CollaboratorSchema)
