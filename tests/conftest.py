@@ -48,7 +48,7 @@ def clean_tables(request, apply_schema):
         cur = conn.cursor()
         cur.execute("""
             TRUNCATE users, categories, products, product_images,
-                     wishlist_items, enquiries, setup_flags RESTART IDENTITY CASCADE
+                     wishlist_items, enquiries, setup_flags, collaborators RESTART IDENTITY CASCADE
         """)
         cur.execute("DELETE FROM site_config")
         cur.execute("""

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.config import settings
 from api.middleware import MaintenanceModeMiddleware
 from api.routers import (
     setup as setup_router,
@@ -14,13 +15,15 @@ from api.routers import (
     wishlist as wishlist_router,
     admin_clients as admin_clients_router,
     admin_dashboard as admin_dashboard_router,
+    ref_data as ref_data_router,
+    collaborators as collaborators_router,
 )
 
 app = FastAPI(title="Clothing Store API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with your Hostinger domain before going live
+    allow_origins=[settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,6 +41,8 @@ app.include_router(account_router.router)
 app.include_router(wishlist_router.router)
 app.include_router(admin_clients_router.router)
 app.include_router(admin_dashboard_router.router)
+app.include_router(ref_data_router.router)
+app.include_router(collaborators_router.router)
 
 
 @app.get("/health")
