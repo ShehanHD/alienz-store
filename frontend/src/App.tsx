@@ -17,6 +17,7 @@ import { ContactPage } from './pages/public/ContactPage'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { ConfirmEmailPage } from './pages/auth/ConfirmEmailPage'
 import { AccountDashboardPage } from './pages/account/AccountDashboardPage'
 import { OrdersPage } from './pages/account/OrdersPage'
 import { WishlistPage } from './pages/account/WishlistPage'
@@ -48,6 +49,7 @@ export default function App() {
                 <Route path="/auth/login" element={<LoginPage />} />
                 <Route path="/auth/register" element={<RegisterPage />} />
                 <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/auth/confirm-email" element={<ConfirmEmailPage />} />
                 <Route element={<RequireAuth />}>
                   <Route path="/account" element={<AccountDashboardPage />} />
                   <Route path="/account/orders" element={<OrdersPage />} />
