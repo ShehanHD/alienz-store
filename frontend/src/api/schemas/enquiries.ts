@@ -1,15 +1,20 @@
 import { z } from 'zod'
 
-export const EnquiryStatusSchema = z.enum(['new', 'read', 'replied'])
+export const EnquiryStatusSchema = z.enum(['new', 'read', 'accepted', 'rejected'])
 
 export const EnquirySchema = z.object({
-  id: z.string().uuid(),
-  user_id: z.string().uuid().nullable(),
-  product_id: z.string().uuid().nullable(),
+  id: z.string(),
+  user_id: z.string().nullable().default(null),
+  product_id: z.string().nullable().default(null),
   name: z.string(),
-  email: z.string().email(),
-  message: z.string(),
+  email: z.string(),
+  phone: z.string().default(''),
+  message: z.string().default(''),
+  size: z.string().default(''),
+  color: z.string().default(''),
+  quantity: z.number().int().min(1).default(1),
   status: EnquiryStatusSchema,
+  rejection_reason: z.string().nullable().default(null),
   created_at: z.string(),
 })
 

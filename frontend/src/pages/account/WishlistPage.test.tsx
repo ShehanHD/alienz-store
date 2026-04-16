@@ -11,6 +11,10 @@ vi.mock('../../api/wishlist', () => ({
   removeFromWishlist: mockRemoveFromWishlist,
 }))
 
+vi.mock('../../contexts/ConfirmContext', () => ({
+  useConfirm: () => vi.fn().mockResolvedValue(true),
+}))
+
 // Mock ProductCard to simplify testing
 vi.mock('../../components/ui/ProductCard', () => ({
   ProductCard: ({ product }: { product: { name: string } }) => <div>{product.name}</div>,

@@ -1,38 +1,66 @@
-/* ContactPage */
+.page {
+  max-width: 640px;
+  margin: var(--space-16) auto;
+  padding: 0 var(--space-8);
+}
+
+.page h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-bottom: var(--space-12);
+}
+
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
+  gap: var(--space-6);
 }
+
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-2);
 }
+
 .field label {
-  font-size: 0.875rem;
+  font-size: 0.625rem;
   font-weight: 500;
-  color: #333;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
+
 .field textarea {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: 0.75rem var(--space-3);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 300;
   resize: vertical;
-  box-sizing: border-box;
+  min-height: 140px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color var(--transition);
 }
+
+.field textarea:focus {
+  outline: none;
+  border-color: var(--text-primary);
+}
+
 .success {
   text-align: center;
-  padding: 2rem;
-  color: #27ae60;
-  font-size: 1.125rem;
-}
-.error {
-  color: #c0392b;
+  padding: var(--space-12);
+  color: var(--success);
   font-size: 0.875rem;
-  margin: 0;
+  letter-spacing: 0.06em;
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { getDashboard } from '../../api/admin'
 import { AdminDashboardSchema } from '../../api/schemas/admin'
-import { Spinner } from '../../components/ui/Spinner'
+import { PageLoader } from '../../components/ui/PageLoader'
 import styles from './AdminDashboardPage.module.css'
 
 type Dashboard = z.infer<typeof AdminDashboardSchema>
@@ -19,7 +19,7 @@ export function AdminDashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Spinner />
+  if (loading) return <PageLoader />
   if (error) return <p role="alert" className={styles.error}>{error}</p>
   if (!data) return null
 

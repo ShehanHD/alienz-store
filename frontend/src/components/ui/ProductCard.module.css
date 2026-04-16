@@ -2,30 +2,51 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: none;
+}
+
+
+.card:hover .image {
+  transform: scale(1.03);
+}
+
+.imageWrapper {
   overflow: hidden;
-  background: #fff;
-  transition: box-shadow 0.2s;
+  border-radius: 12px;
 }
-.card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
+
 .image {
   width: 100%;
   aspect-ratio: 3/4;
   object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
 }
+
 .body {
-  padding: 0.75rem 1rem;
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
 }
+
 .name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin: 0 0 0.25rem;
-}
-.price {
-  font-size: 1rem;
-  color: #111;
+  font-family: var(--font-heading);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   margin: 0;
+  color: var(--text-primary);
+}
+
+.price {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  margin: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }

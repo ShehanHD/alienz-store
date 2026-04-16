@@ -184,7 +184,10 @@ All limits are stored as key/value pairs in the DB and editable only by the `own
 | user_id | UUID | → users (nullable — guests allowed) |
 | product_id | UUID | → products (nullable — general enquiries) |
 | name, email | TEXT | |
+| phone | TEXT | Optional contact phone |
 | message | TEXT | |
+| size | TEXT | Optional — size selected at enquiry time |
+| color | TEXT | Optional — color selected at enquiry time |
 | status | ENUM | 'new' \| 'read' \| 'replied' |
 | created_at | TIMESTAMPTZ | |
 

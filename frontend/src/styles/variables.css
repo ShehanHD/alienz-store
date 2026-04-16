@@ -1,14 +1,40 @@
 :root {
+  /* Colors */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f8f6;
+  --bg-secondary: #fafafa;
   --bg-card: #ffffff;
-  --text-primary: #1a1a1a;
-  --text-secondary: #6b6b6b;
-  --accent: #2c2c2c;
-  --accent-hover: #444444;
-  --border: #e5e5e5;
-  --error: #c0392b;
-  --success: #27ae60;
-  --radius: 6px;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --text-primary: #111111;
+  --text-secondary: #888888;
+  --accent: #111111;
+  --accent-hover: #333333;
+  --gold: #9a7b3b;
+  --gold-light: #c4a55a;
+  --border: #e8e8e8;
+  --border-dark: #cccccc;
+  --error: #b91c1c;
+  --error-bg: #fef2f2;
+  --success: #166534;
+  --success-bg: #f0fdf4;
+
+  /* Typography */
+  --font-heading: 'Cormorant', Georgia, serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+
+  /* Spacing (8pt grid) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Transitions */
+  --transition: 0.2s ease;
+
+  /* Radius — sharp for luxury minimal */
+  --radius: 0px;
+  --radius-sm: 2px;
 }

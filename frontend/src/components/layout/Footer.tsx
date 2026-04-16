@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { submitEnquiry } from '../../api/enquiries'
 import styles from './Footer.module.css'
 
-const PHONE = '+1 234 567 8900'
-const EMAIL = 'hello@alienz.com'
-const INSTAGRAM_URL = 'https://instagram.com/alienzstore'
-const TIKTOK_URL = 'https://tiktok.com/@alienzstore'
+const PHONE = '+39 389 143 8813'
+const EMAIL = 'info@alienz.store'
+const INSTAGRAM_URL = 'https://www.instagram.com/the_alienz1?igsh=dHdtNHdldGQ2d2V1'
+const TIKTOK_URL = 'https://www.tiktok.com/@the.alienz00?_r=1&_t=ZN-95ZHbGGzWuk'
 
 function InstagramIcon() {
   return (

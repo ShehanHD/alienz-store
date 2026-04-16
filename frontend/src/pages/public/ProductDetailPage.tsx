@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getProduct, getProductFilters } from '../../api/products'
+import { getProduct, getProductFilters, getProducts } from '../../api/products'
 import type { ProductFilterColor } from '../../api/products'
 import { submitEnquiry } from '../../api/enquiries'
 import { ImageGallery } from '../../components/ui/ImageGallery'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { PageLoader } from '../../components/ui/PageLoader'
+import { ProductCard } from '../../components/ui/ProductCard'
 import { useAuth } from '../../hooks/useAuth'
 import type { Product } from '../../types'
 import styles from './ProductDetailPage.module.css'
@@ -17,6 +18,7 @@ export function ProductDetailPage() {
 
   const [product, setProduct] = useState<Product | null>(null)
   const [colorMap, setColorMap] = useState<Record<string, string>>({})
+  const [suggested, setSuggested] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -26,6 +28,7 @@ export function ProductDetailPage() {
   const [phone, setPhone] = useState('')
   const [selectedSize, setSelectedSize] = useState('')
   const [selectedColor, setSelectedColor] = useState('')
+  const [quantity, setQuantity] = useState(1)
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
@@ -47,6 +50,14 @@ export function ProductDetailPage() {
       })
       .catch(() => {})
   }, [slug])
+
+  // Fetch suggested products once the product is known
+  useEffect(() => {
+    if (!product?.category?.slug) return
+    void getProducts({ category: product.category.slug, page_size: 5 })
+      .then((res) => setSuggested(res.results.filter((r) => r.id !== product.id).slice(0, 4)))
+      .catch(() => {})
+  }, [product?.id, product?.category?.slug])
 
   // Sync user data when available
   useEffect(() => {
@@ -77,6 +88,7 @@ export function ProductDetailPage() {
         phone: user ? (user.phone ?? phone) : phone,
         size: selectedSize,
         color: selectedColor,
+        quantity,
         message,
         product_id: product.id,
       })
@@ -92,6 +104,7 @@ export function ProductDetailPage() {
   if (error || !product) return <p>Product not found.</p>
 
   return (
+    <>
     <div className={styles.page}>
       <ImageGallery images={product.images} alt={product.name} />
 
@@ -157,6 +170,37 @@ export function ProductDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Quantity */}
+            <div className={styles.selectorField}>
+              <label className={styles.selectorLabel}>Quantity</label>
+              <div className={styles.quantityStepper}>
+                <button
+                  type="button"
+                  className={styles.quantityBtn}
+                  aria-label="Decrease quantity"
+                  disabled={quantity <= 1}
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                >−</button>
+                <input
+                  type="number"
+                  className={styles.quantityValue}
+                  value={quantity}
+                  min={1}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10)
+                    if (!isNaN(v) && v >= 1) setQuantity(v)
+                  }}
+                  aria-label="Quantity"
+                />
+                <button
+                  type="button"
+                  className={styles.quantityBtn}
+                  aria-label="Increase quantity"
+                  onClick={() => setQuantity((q) => q + 1)}
+                >+</button>
+              </div>
+            </div>
 
             {/* Optional message */}
             <div className={styles.selectorField}>
@@ -264,5 +308,17 @@ export function ProductDetailPage() {
         </div>
       </div>
     </div>
+
+    {suggested.length > 0 && (
+      <section className={styles.suggested}>
+        <h2 className={styles.suggestedTitle}>You May Also Like</h2>
+        <div className={styles.suggestedGrid}>
+          {suggested.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      </section>
+    )}
+    </>
   )
 }

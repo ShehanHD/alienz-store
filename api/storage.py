@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from supabase import create_client, Client
 from .config import settings
 
@@ -6,6 +7,11 @@ _client: Client | None = None
 
 def _get_client() -> Client:
     global _client
+    if not settings.supabase_url or not settings.supabase_service_key:
+        raise HTTPException(
+            status_code=503,
+            detail="Image storage is not configured. Add SUPABASE_URL and SUPABASE_SERVICE_KEY to .env",
+        )
     if _client is None:
         _client = create_client(settings.supabase_url, settings.supabase_service_key)
     return _client

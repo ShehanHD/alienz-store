@@ -24,6 +24,7 @@ export const AdminUserSchema = z.object({
   role: z.enum(['client', 'admin', 'owner']),
   first_name: z.string(),
   last_name: z.string(),
+  phone: z.string().default(''),
   is_active: z.boolean(),
   created_at: z.string(),
 })

@@ -22,17 +22,28 @@ export async function getAdminProducts(params: AdminProductFilters = {}): Promis
   return PaginatedProductsSchema.parse(res.data)
 }
 
-export async function createProduct(data: FormData): Promise<Product> {
-  const res = await getApiClient().post('/admin/products', data, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+export interface ProductPayload {
+  name: string
+  description: string
+  price: number
+  category_ids: string[]
+  sizes: string[]
+  colors: string[]
+  models: string[]
+  fits: string[]
+  materials: string[]
+  accessory_styles: string[]
+  is_active: boolean
+  is_featured: boolean
+}
+
+export async function createProduct(data: ProductPayload): Promise<Product> {
+  const res = await getApiClient().post('/admin/products', data)
   return ProductSchema.parse(res.data)
 }
 
-export async function updateProduct(id: string, data: FormData): Promise<Product> {
-  const res = await getApiClient().patch(`/admin/products/${id}`, data, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+export async function updateProduct(id: string, data: ProductPayload): Promise<Product> {
+  const res = await getApiClient().put(`/admin/products/${id}`, data)
   return ProductSchema.parse(res.data)
 }
 
@@ -66,4 +77,26 @@ export async function getSiteConfig(): Promise<SiteConfig[]> {
 export async function updateSiteConfig(key: string, value: string): Promise<SiteConfig> {
   const res = await getApiClient().put(`/admin/settings/${key}`, { value })
   return SiteConfigSchema.parse(res.data)
+}
+
+export async function getImageConfig(): Promise<{ max_images_per_product: number; max_upload_size_mb: number }> {
+  const res = await getApiClient().get('/admin/image-config')
+  return res.data as { max_images_per_product: number; max_upload_size_mb: number }
+}
+
+export async function uploadProductImage(productId: string, file: File): Promise<void> {
+  const form = new FormData()
+  form.append('file', file)
+  // Clear Content-Type so Axios auto-sets multipart/form-data with the correct boundary
+  await getApiClient().post(`/admin/products/${productId}/images`, form, {
+    headers: { 'Content-Type': undefined },
+  })
+}
+
+export async function deleteProductImage(productId: string, imageId: string): Promise<void> {
+  await getApiClient().delete(`/admin/products/${productId}/images/${imageId}`)
+}
+
+export async function setPrimaryImage(productId: string, imageId: string): Promise<void> {
+  await getApiClient().put(`/admin/products/${productId}/images/${imageId}/primary`)
 }

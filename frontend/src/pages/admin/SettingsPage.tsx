@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getSiteConfig, updateSiteConfig } from '../../api/admin'
-import { Spinner } from '../../components/ui/Spinner'
+import { Button } from '../../components/ui/Button'
+import { PageLoader } from '../../components/ui/PageLoader'
 import type { SiteConfig } from '../../types'
 import styles from './SettingsPage.module.css'
 
@@ -40,7 +41,7 @@ export function SettingsPage() {
     }
   }
 
-  if (loading) return <Spinner />
+  if (loading) return <PageLoader />
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
@@ -53,6 +54,7 @@ export function SettingsPage() {
       {configs.length === 0 ? (
         <p>No settings found.</p>
       ) : (
+        <div className={styles.tableWrap}>
         <table className={styles.table}>
           <thead>
             <tr>
@@ -75,18 +77,13 @@ export function SettingsPage() {
                   />
                 </td>
                 <td>
-                  <button
-                    type="button"
-                    disabled={saving}
-                    onClick={() => void handleSave(config.key)}
-                  >
-                    Save
-                  </button>
+                  <Button type="button" variant="secondary" loading={saving} onClick={() => void handleSave(config.key)}>Save</Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   )

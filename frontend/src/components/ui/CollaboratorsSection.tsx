@@ -13,7 +13,33 @@ export function CollaboratorsSection() {
   if (collaborators.length === 0) return null
 
   const featured = collaborators.filter(c => c.is_featured)
-  const strip = collaborators.filter(c => !c.is_featured)
+  const persons = collaborators.filter(c => !c.is_featured && c.collab_type === 'person')
+  const logos = collaborators.filter(c => !c.is_featured && c.collab_type === 'logo')
+
+  function renderStrip(items: Collaborator[]) {
+    const scrolling = items.length > 1
+    return (
+      <div className={styles.stripWrap}>
+        <div className={scrolling ? styles.strip : styles.stripStatic}>
+          {(scrolling ? [...items, ...items] : items).map((c, i) => (
+            <a
+              key={`${c.id}-${i}`}
+              href={c.instagram_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={c.collab_type === 'logo' ? styles.stripItemLogo : styles.stripItem}
+            >
+              <div
+                className={c.collab_type === 'person' ? styles.stripImagePerson : styles.stripImageLogo}
+                style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
+              />
+              {c.collab_type === 'person' && <span className={styles.stripName}>{c.name}</span>}
+            </a>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <section className={styles.section}>
@@ -28,35 +54,19 @@ export function CollaboratorsSection() {
               target="_blank"
               rel="noopener noreferrer"
               className={styles.heroCard}
-              style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
             >
-              <span className={styles.heroName}>{c.name}</span>
+              <div
+                className={c.collab_type === 'person' ? styles.heroImagePerson : styles.heroImageLogo}
+                style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
+              />
+              {c.collab_type === 'person' && <span className={styles.heroName}>{c.name}</span>}
             </a>
           ))}
         </div>
       )}
 
-      {strip.length > 0 && (
-        <div className={styles.stripWrap}>
-          <div className={styles.strip}>
-            {[...strip, ...strip].map((c, i) => (
-              <a
-                key={`${c.id}-${i}`}
-                href={c.instagram_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.stripItem}
-              >
-                <div
-                  className={styles.stripImage}
-                  style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
-                />
-                <span className={styles.stripName}>{c.name}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+      {persons.length > 0 && renderStrip(persons)}
+      {logos.length > 0 && renderStrip(logos)}
     </section>
   )
 }

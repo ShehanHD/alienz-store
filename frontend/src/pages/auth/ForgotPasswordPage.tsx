@@ -3,9 +3,11 @@ import styles from './ForgotPasswordPage.module.css'
 
 export function ForgotPasswordPage() {
   return (
-    <div className={styles.container}>
-      <h1>Password Reset</h1>
-      <p>Please contact the store to reset your password.</p>
+    <div className={styles.wrapper}>
+      <div className={styles.container}>
+        <h1 className={styles.heading}>Password Reset</h1>
+        <p className={styles.subtitle}>Please contact the store to reset your password.</p>
+      </div>
     </div>
   )
 }

@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react'
-import { z } from 'zod'
-import { getApiClient } from '../../api/client'
-import { EnquirySchema } from '../../api/schemas'
+import { getMyEnquiries } from '../../api/enquiries'
+import type { Enquiry } from '../../types'
 import styles from './OrdersPage.module.css'
-
-type Enquiry = z.infer<typeof EnquirySchema>
-
-const EnquiriesListSchema = z.array(EnquirySchema)
 
 export function OrdersPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
@@ -14,12 +9,8 @@ export function OrdersPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    getApiClient()
-      .get('/account/enquiries')
-      .then((res) => {
-        const parsed = EnquiriesListSchema.parse(res.data)
-        setEnquiries(parsed)
-      })
+    getMyEnquiries()
+      .then((data) => setEnquiries(data.items))
       .catch(() => setError('Failed to load enquiries. Please try again.'))
       .finally(() => setLoading(false))
   }, [])

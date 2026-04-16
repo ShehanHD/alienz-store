@@ -1,6 +1,6 @@
 export type Role = 'client' | 'admin' | 'owner'
 
-export type EnquiryStatus = 'new' | 'read' | 'replied'
+export type EnquiryStatus = 'new' | 'read' | 'accepted' | 'rejected'
 
 export interface User {
   id: string
@@ -31,6 +31,8 @@ export interface Category {
   show_in_navbar: boolean
 }
 
+export type CollabType = 'person' | 'logo'
+
 export interface Collaborator {
   id: string
   name: string
@@ -38,6 +40,7 @@ export interface Collaborator {
   image_url: string | null
   is_featured: boolean
   display_order: number
+  collab_type: CollabType
   created_at: string
 }
 
@@ -90,7 +93,9 @@ export interface Enquiry {
   message: string
   size: string
   color: string
+  quantity: number
   status: EnquiryStatus
+  rejection_reason: string | null
   created_at: string
 }
 

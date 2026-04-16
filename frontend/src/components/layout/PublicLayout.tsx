@@ -4,10 +4,12 @@ import { Footer } from './Footer'
 
 export function PublicLayout() {
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
       <Navbar />
-      <Outlet />
+      <main style={{ flex: 1 }}>
+        <Outlet />
+      </main>
       <Footer />
-    </>
+    </div>
   )
 }

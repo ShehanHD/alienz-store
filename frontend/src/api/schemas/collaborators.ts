@@ -7,6 +7,7 @@ export const CollaboratorSchema = z.object({
   image_url: z.string().nullable(),
   is_featured: z.boolean(),
   display_order: z.number(),
+  collab_type: z.enum(['person', 'logo']).default('person'),
   created_at: z.string(),
 }).passthrough()
 

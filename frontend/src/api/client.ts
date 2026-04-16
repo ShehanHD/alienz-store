@@ -7,6 +7,7 @@ export function createApiClient(getToken: () => string | null): AxiosInstance {
     baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
     headers: { 'Content-Type': 'application/json' },
     timeout: 10000,
+    withCredentials: true,
   })
 
   client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -31,7 +32,8 @@ export function initApiClient(
     (res) => res,
     async (error: AxiosError) => {
       const original = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
-      if (error.response?.status === 401 && !original._retry) {
+      const isRefreshCall = original?.url?.includes('/auth/refresh')
+      if (error.response?.status === 401 && !original._retry && !isRefreshCall) {
         original._retry = true
         const newToken = await refresh()
         if (newToken) {

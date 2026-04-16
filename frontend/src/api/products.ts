@@ -7,6 +7,10 @@ interface ProductFilters {
   page_size?: number
   category?: string
   search?: string
+  min_price?: number
+  max_price?: number
+  color?: string
+  size?: string
 }
 
 export async function getProducts(filters: ProductFilters = {}): Promise<PaginatedResponse<Product>> {
@@ -17,4 +21,11 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Paginat
 export async function getProduct(slug: string): Promise<Product> {
   const res = await getApiClient().get(`/products/${slug}`)
   return ProductSchema.parse(res.data)
+}
+
+export interface ProductFilterColor { name: string; hex: string }
+
+export async function getProductFilters(): Promise<{ colors: ProductFilterColor[]; sizes: string[] }> {
+  const res = await getApiClient().get('/products/filters')
+  return res.data as { colors: ProductFilterColor[]; sizes: string[] }
 }

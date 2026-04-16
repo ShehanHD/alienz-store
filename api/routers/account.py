@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 
 from api.auth import hash_password, verify_password
@@ -11,6 +11,7 @@ router = APIRouter(prefix="/account", tags=["account"])
 class ProfileIn(BaseModel):
     first_name: str
     last_name: str
+    phone: str = ""
 
 
 class ChangePasswordIn(BaseModel):
@@ -25,6 +26,41 @@ class AddressIn(BaseModel):
     postal_code: str
 
 
+@router.get("/enquiries")
+def get_my_enquiries(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    current_user: dict = Depends(get_current_user),
+    conn=Depends(get_db),
+) -> dict:
+    offset = (page - 1) * page_size
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, user_id, product_id, name, email, phone, message, size, color, status, created_at
+            FROM enquiries
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+            LIMIT %s OFFSET %s
+            """,
+            (current_user["id"], page_size, offset),
+        )
+        rows = cur.fetchall()
+        cur.execute("SELECT COUNT(*) AS total FROM enquiries WHERE user_id = %s", (current_user["id"],))
+        total = cur.fetchone()["total"]
+
+    items = []
+    for row in rows:
+        r = dict(row)
+        r["id"] = str(r["id"])
+        r["user_id"] = str(r["user_id"]) if r["user_id"] else None
+        r["product_id"] = str(r["product_id"]) if r["product_id"] else None
+        r["created_at"] = r["created_at"].isoformat() if r["created_at"] else None
+        items.append(r)
+
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
 @router.get("/profile")
 def get_profile(
     current_user: dict = Depends(get_current_user),
@@ -32,7 +68,7 @@ def get_profile(
 ) -> dict:
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT id, email, first_name, last_name, role, created_at FROM users WHERE id = %s",
+            "SELECT id, email, first_name, last_name, phone, role, is_active, created_at FROM users WHERE id = %s",
             (current_user["id"],),
         )
         user = cur.fetchone()
@@ -51,11 +87,11 @@ def update_profile(
         cur.execute(
             """
             UPDATE users
-            SET first_name = %s, last_name = %s
+            SET first_name = %s, last_name = %s, phone = %s
             WHERE id = %s
-            RETURNING id, email, first_name, last_name, role, created_at
+            RETURNING id, email, first_name, last_name, phone, role, is_active, created_at
             """,
-            (body.first_name, body.last_name, current_user["id"]),
+            (body.first_name, body.last_name, body.phone, current_user["id"]),
         )
         user = cur.fetchone()
     if not user:

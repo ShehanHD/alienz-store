@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { getWishlist, removeFromWishlist } from '../../api/wishlist'
 import { ProductCard } from '../../components/ui/ProductCard'
+import { useConfirm } from '../../contexts/ConfirmContext'
 import type { WishlistItem } from '../../types'
 import styles from './WishlistPage.module.css'
 
 export function WishlistPage() {
+  const confirm = useConfirm()
   const [items, setItems] = useState<WishlistItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -17,6 +19,8 @@ export function WishlistPage() {
   }, [])
 
   async function handleRemove(productId: string) {
+    const ok = await confirm('Remove this item from your wishlist?', { title: 'Remove from Wishlist', confirmLabel: 'Remove', variant: 'danger' })
+    if (!ok) return
     try {
       await removeFromWishlist(productId)
       setItems((prev) => prev.filter((item) => item.product_id !== productId))

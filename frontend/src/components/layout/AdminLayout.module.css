@@ -2,17 +2,147 @@
   display: flex;
   min-height: 100vh;
 }
+
+/* Mobile top bar — hidden on desktop */
+.mobileBar {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--text-primary);
+  color: #ffffff;
+  height: 52px;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menuBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2);
+}
+
+.mobileTitle {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Overlay for mobile sidebar */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 149;
+}
+
 .sidebar {
   width: 220px;
-  background: #111;
-  color: #fff;
+  background: var(--text-primary);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 0;
+  justify-content: space-between;
+  padding: var(--space-8) 0 var(--space-6);
   flex-shrink: 0;
 }
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sidebarFooter {
+  padding: var(--space-4) 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0 var(--space-8);
+}
+
+.backToShop {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  padding: var(--space-3) 0;
+  transition: color var(--transition);
+}
+
+.backToShop:hover {
+  color: #ffffff;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-8);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color var(--transition), background var(--transition);
+  min-height: 44px;
+}
+
+.sidebar a:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar a.active {
+  color: var(--gold-light);
+}
+
 .main {
   flex: 1;
-  background: #f9f9f9;
+  background: var(--bg-secondary);
   overflow-y: auto;
+  /* Prevent content from going under mobile bar */
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .mobileBar {
+    display: flex;
+  }
+
+  .overlay {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    bottom: 0;
+    z-index: 150;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    padding-top: var(--space-4);
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
 }

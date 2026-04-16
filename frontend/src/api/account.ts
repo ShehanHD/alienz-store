@@ -5,11 +5,11 @@ import { UserSchema } from './schemas/auth'
 import type { Address, User } from '../types'
 
 export async function updateProfile(data: {
-  first_name?: string
-  last_name?: string
-  email?: string
+  first_name: string
+  last_name: string
+  phone: string
 }): Promise<User> {
-  const res = await getApiClient().patch('/account/profile', data)
+  const res = await getApiClient().put('/account/profile', data)
   return UserSchema.parse(res.data)
 }
 
@@ -23,6 +23,7 @@ export async function changePassword(data: {
 export async function getAddress(): Promise<Address | null> {
   try {
     const res = await getApiClient().get('/account/address')
+    if (!res.data) return null
     return AddressSchema.parse(res.data)
   } catch (err) {
     if (axios.isAxiosError(err) && err.response?.status === 404) return null

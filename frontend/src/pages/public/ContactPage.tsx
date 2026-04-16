@@ -17,7 +17,7 @@ export function ContactPage() {
     setLoading(true)
     setError('')
     try {
-      await submitEnquiry({ name, email, message })
+      await submitEnquiry({ name, email, phone: '', message })
       setSent(true)
     } catch {
       setError('Failed to send. Please try again.')
@@ -26,19 +26,21 @@ export function ContactPage() {
     }
   }
 
-  if (sent) return <p className={styles.success}>Thanks! We'll be in touch.</p>
+  if (sent) return <div className={styles.page}><p className={styles.success}>Thanks! We&apos;ll be in touch.</p></div>
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} className={styles.form}>
-      <h1>Contact Us</h1>
-      <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-      <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      <div className={styles.field}>
-        <label htmlFor="message">Message</label>
-        <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} required rows={5} />
-      </div>
-      {error && <p className={styles.error}>{error}</p>}
-      <Button type="submit" loading={loading}>Send</Button>
-    </form>
+    <div className={styles.page}>
+      <h1>Contact</h1>
+      <form onSubmit={(e) => void handleSubmit(e)} className={styles.form}>
+        <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <div className={styles.field}>
+          <label htmlFor="message">Message</label>
+          <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} required rows={5} />
+        </div>
+        {error && <p className={styles.error}>{error}</p>}
+        <Button type="submit" loading={loading}>Send Message</Button>
+      </form>
+    </div>
   )
 }

@@ -17,6 +17,7 @@ const mockProduct = {
 vi.mock('../../api/products', () => ({
   getProduct: vi.fn(),
   getProductFilters: vi.fn().mockResolvedValue({ colors: [] }),
+  getProducts: vi.fn().mockResolvedValue({ results: [], total: 0, page: 1, page_size: 5, total_pages: 0 }),
 }))
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: vi.fn().mockReturnValue({ user: null }),
