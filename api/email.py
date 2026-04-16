@@ -57,8 +57,7 @@ def _send(to: str, subject: str, html: str) -> None:
 
 
 def send_email_confirmation(to_email: str, token: str) -> None:
-    safe_token = html_module.escape(token)
-    confirm_url = f"{settings.site_url}/auth/confirm-email?token={safe_token}"
+    confirm_url = f"{settings.site_url}/auth/confirm-email?token={token}"
     html = _load_template("email-confirmation.html").replace("__CONFIRM_URL__", confirm_url)
     _send(to_email, "Confirm your email address", html)
 
