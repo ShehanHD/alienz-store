@@ -1,26 +1,37 @@
 import { getApiClient } from './client'
-import { AuthUserSchema, TokenResponseSchema, UserSchema } from './schemas/auth'
+import { AuthUserSchema, MessageResponseSchema, RegisterResponseSchema, TokenResponseSchema, UserSchema } from './schemas/auth'
 import type { User } from '../types'
 
 export async function login(email: string, password: string): Promise<{ access_token: string; user: User }> {
   const res = await getApiClient().post('/auth/login', { email, password })
-  const parsed = AuthUserSchema.parse(res.data)
-  return parsed
+  return AuthUserSchema.parse(res.data)
 }
 
 export async function register(
   email: string,
   password: string,
-  firstName?: string,
-  lastName?: string,
-): Promise<{ access_token: string; user: User }> {
+  firstName: string,
+  lastName: string,
+  phone: string,
+): Promise<{ detail: string }> {
   const res = await getApiClient().post('/auth/register', {
     email,
     password,
     first_name: firstName,
     last_name: lastName,
+    phone,
   })
-  return AuthUserSchema.parse(res.data)
+  return RegisterResponseSchema.parse(res.data)
+}
+
+export async function confirmEmail(token: string): Promise<{ detail: string }> {
+  const res = await getApiClient().get(`/auth/confirm-email?token=${encodeURIComponent(token)}`)
+  return MessageResponseSchema.parse(res.data)
+}
+
+export async function resendConfirmation(email: string): Promise<{ detail: string }> {
+  const res = await getApiClient().post('/auth/resend-confirmation', { email })
+  return MessageResponseSchema.parse(res.data)
 }
 
 export async function refreshToken(): Promise<string | null> {
