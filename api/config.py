@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     supabase_storage_bucket: str = "product-images"
     environment: str = "development"
     frontend_url: str = "http://localhost:5173"
+    site_url: str = "http://localhost:5173"
     smtp_host: str = ""
     smtp_port: int = 465
     smtp_user: str = ""

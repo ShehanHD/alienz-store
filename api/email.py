@@ -58,7 +58,7 @@ def _send(to: str, subject: str, html: str) -> None:
 
 def send_email_confirmation(to_email: str, token: str) -> None:
     safe_token = html_module.escape(token)
-    confirm_url = f"{settings.frontend_url}/auth/confirm-email?token={safe_token}"
+    confirm_url = f"{settings.site_url}/auth/confirm-email?token={safe_token}"
     html = _load_template("email-confirmation.html").replace("__CONFIRM_URL__", confirm_url)
     _send(to_email, "Confirm your email address", html)
 
@@ -67,7 +67,7 @@ def send_enquiry_notification(
     enquiry: dict, admin_email: str, product_name: str | None
 ) -> None:
     e = html_module.escape
-    admin_url = f"{settings.frontend_url}/admin/enquiries"
+    admin_url = f"{settings.site_url}/admin/enquiries"
     rows = _product_rows(enquiry, product_name) if product_name else ""
     html = (
         _load_template("enquiry-notification.html")
