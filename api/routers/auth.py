@@ -1,3 +1,5 @@
+import secrets
+from datetime import datetime, timezone
 from typing import Optional
 
 import psycopg2.errors
@@ -13,11 +15,12 @@ from api.auth import (
 )
 from api.db import get_db
 from api.dependencies import get_config, get_current_user
+from api.email import send_email_confirmation
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 _REFRESH_COOKIE = "refresh_token"
-_COOKIE_MAX_AGE = 7 * 24 * 60 * 60  # 7 days in seconds
+_COOKIE_MAX_AGE = 7 * 24 * 60 * 60
 
 
 class RegisterIn(BaseModel):
@@ -25,6 +28,7 @@ class RegisterIn(BaseModel):
     password: str = Field(min_length=8)
     first_name: str = Field(min_length=1, max_length=100)
     last_name: str = Field(min_length=1, max_length=100)
+    phone: str = Field(min_length=1, max_length=30)
 
 
 class LoginIn(BaseModel):
@@ -32,12 +36,17 @@ class LoginIn(BaseModel):
     password: str
 
 
+class ResendConfirmationIn(BaseModel):
+    email: EmailStr
+
+
 def _set_refresh_cookie(response: Response, token: str) -> None:
+    from api.config import settings
     response.set_cookie(
         key=_REFRESH_COOKIE,
         value=token,
         httponly=True,
-        secure=True,
+        secure=settings.environment == "production",
         samesite="lax",
         max_age=_COOKIE_MAX_AGE,
     )
@@ -46,7 +55,6 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(
     body: RegisterIn,
-    response: Response,
     conn=Depends(get_db),
 ) -> dict:
     if get_config("allow_registrations", conn) != "true":
@@ -57,34 +65,91 @@ def register(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO users (email, hashed_password, role, first_name, last_name)
-                VALUES (%s, %s, 'client', %s, %s)
-                RETURNING id, email, role
+                INSERT INTO users (email, hashed_password, role, first_name, last_name, phone, is_active)
+                VALUES (%s, %s, 'client', %s, %s, %s, FALSE)
+                RETURNING id, email
                 """,
-                (str(body.email), hashed, body.first_name, body.last_name),
+                (str(body.email), hashed, body.first_name, body.last_name, body.phone),
             )
             user = dict(cur.fetchone())
     except psycopg2.errors.UniqueViolation:
-        conn.rollback()  # must clear aborted txn before raising HTTPException
+        conn.rollback()
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
-    access = create_access_token(str(user["id"]), user["role"])
-    refresh = create_refresh_token(str(user["id"]))
-    _set_refresh_cookie(response, refresh)
+    token = secrets.token_hex(32)
+    with conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO email_confirmations (user_id, token) VALUES (%s, %s)",
+            (str(user["id"]), token),
+        )
 
-    return {
-        "user_id": str(user["id"]),
-        "email": user["email"],
-        "role": user["role"],
-        "access_token": access,
-    }
+    send_email_confirmation(str(body.email), token)
+
+    return {"detail": "Check your email to confirm your account"}
+
+
+@router.get("/confirm-email")
+def confirm_email(token: str, conn=Depends(get_db)) -> dict:
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, user_id, expires_at, used_at FROM email_confirmations WHERE token = %s",
+            (token,),
+        )
+        row = cur.fetchone()
+
+    if not row:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid confirmation link")
+
+    row = dict(row)
+    if row["used_at"] is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Confirmation link already used")
+
+    if row["expires_at"] < datetime.now(timezone.utc):
+        raise HTTPException(status_code=410, detail="Confirmation link has expired")
+
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE email_confirmations SET used_at = NOW() WHERE id = %s",
+            (str(row["id"]),),
+        )
+        cur.execute("UPDATE users SET is_active = TRUE WHERE id = %s", (str(row["user_id"]),))
+
+    return {"detail": "Email confirmed. You can now log in."}
+
+
+@router.post("/resend-confirmation")
+def resend_confirmation(body: ResendConfirmationIn, conn=Depends(get_db)) -> dict:
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id FROM users WHERE email = %s AND is_active = FALSE",
+            (str(body.email),),
+        )
+        user = cur.fetchone()
+
+    if user:
+        user_id = str(user["id"])
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE email_confirmations SET used_at = NOW() "
+                "WHERE user_id = %s AND used_at IS NULL",
+                (user_id,),
+            )
+        token = secrets.token_hex(32)
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO email_confirmations (user_id, token) VALUES (%s, %s)",
+                (user_id, token),
+            )
+        send_email_confirmation(str(body.email), token)
+
+    return {"detail": "If that account exists and is unconfirmed, a new link has been sent."}
 
 
 @router.post("/login")
 def login(body: LoginIn, response: Response, conn=Depends(get_db)) -> dict:
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT id, hashed_password, role, is_active FROM users WHERE email = %s",
+            "SELECT id, email, hashed_password, role, first_name, last_name, is_active, created_at FROM users WHERE email = %s",
             (str(body.email),),
         )
         user = cur.fetchone()
@@ -96,7 +161,42 @@ def login(body: LoginIn, response: Response, conn=Depends(get_db)) -> dict:
     refresh = create_refresh_token(str(user["id"]))
     _set_refresh_cookie(response, refresh)
 
-    return {"access_token": access}
+    return {
+        "access_token": access,
+        "user": {
+            "id": str(user["id"]),
+            "email": user["email"],
+            "role": user["role"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "is_active": user["is_active"],
+            "created_at": user["created_at"].isoformat(),
+        },
+    }
+
+
+@router.get("/me")
+def me(conn=Depends(get_db), current_user: dict = Depends(get_current_user)) -> dict:
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, email, role, first_name, last_name, phone, is_active, created_at FROM users WHERE id = %s",
+            (current_user["id"],),
+        )
+        user = cur.fetchone()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return {
+        "id": str(user["id"]),
+        "email": user["email"],
+        "role": user["role"],
+        "first_name": user["first_name"],
+        "last_name": user["last_name"],
+        "phone": user["phone"] or "",
+        "is_active": user["is_active"],
+        "created_at": user["created_at"].isoformat(),
+    }
 
 
 @router.post("/logout")
