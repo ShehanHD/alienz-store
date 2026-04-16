@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { confirmEmail, resendConfirmation } from '../../api/auth'
@@ -15,6 +16,7 @@ export function ConfirmEmailPage() {
   const [resendEmail, setResendEmail] = useState('')
   const [resendSent, setResendSent] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
+  const [resendError, setResendError] = useState('')
 
   useEffect(() => {
     if (!token) {
@@ -24,17 +26,20 @@ export function ConfirmEmailPage() {
     confirmEmail(token)
       .then(() => setState('success'))
       .catch((err: unknown) => {
-        const status = (err as { response?: { status?: number } }).response?.status
+        const status = axios.isAxiosError(err) ? err.response?.status : undefined
         setState(status === 410 ? 'expired' : 'invalid')
       })
   }, [token])
 
   const handleResend = async (e: FormEvent) => {
     e.preventDefault()
+    setResendError('')
     setResendLoading(true)
     try {
       await resendConfirmation(resendEmail)
       setResendSent(true)
+    } catch {
+      setResendError('Failed to send. Please try again.')
     } finally {
       setResendLoading(false)
     }
@@ -79,6 +84,7 @@ export function ConfirmEmailPage() {
                 onChange={(e) => setResendEmail(e.target.value)}
                 required
               />
+              {resendError && <p role="alert">{resendError}</p>}
               <Button type="submit" loading={resendLoading}>Resend</Button>
             </form>
           )}

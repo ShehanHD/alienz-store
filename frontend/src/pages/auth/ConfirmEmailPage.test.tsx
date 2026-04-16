@@ -3,6 +3,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ConfirmEmailPage } from './ConfirmEmailPage'
 
+function makeAxiosError(message: string, status: number): Error {
+  return Object.assign(new Error(message), { isAxiosError: true, response: { status } })
+}
+
 const mockConfirmEmail = vi.hoisted(() => vi.fn())
 const mockResendConfirmation = vi.hoisted(() => vi.fn())
 
@@ -35,7 +39,7 @@ describe('ConfirmEmailPage', () => {
   })
 
   it('shows expired message on 410 response', async () => {
-    const err = Object.assign(new Error('Gone'), { response: { status: 410 } })
+    const err = makeAxiosError('Gone', 410)
     mockConfirmEmail.mockRejectedValue(err)
     renderWithToken('expiredtoken')
     await waitFor(() => expect(screen.getByText(/link has expired/i)).toBeInTheDocument())
@@ -43,14 +47,14 @@ describe('ConfirmEmailPage', () => {
   })
 
   it('shows invalid message on 400 response', async () => {
-    const err = Object.assign(new Error('Bad Request'), { response: { status: 400 } })
+    const err = makeAxiosError('Bad Request', 400)
     mockConfirmEmail.mockRejectedValue(err)
     renderWithToken('badtoken')
     await waitFor(() => expect(screen.getByText(/invalid.*link/i)).toBeInTheDocument())
   })
 
   it('resend sends the confirmation and shows success', async () => {
-    const err = Object.assign(new Error('Gone'), { response: { status: 410 } })
+    const err = makeAxiosError('Gone', 410)
     mockConfirmEmail.mockRejectedValue(err)
     mockResendConfirmation.mockResolvedValue({ detail: 'If that account exists...' })
     renderWithToken('expiredtoken')
@@ -59,5 +63,16 @@ describe('ConfirmEmailPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /resend/i }))
     await waitFor(() => expect(mockResendConfirmation).toHaveBeenCalledWith('user@example.com'))
     await waitFor(() => expect(screen.getByText(/new link sent/i)).toBeInTheDocument())
+  })
+
+  it('shows error message when resend fails', async () => {
+    const expiredErr = makeAxiosError('Gone', 410)
+    mockConfirmEmail.mockRejectedValue(expiredErr)
+    mockResendConfirmation.mockRejectedValue(new Error('Network error'))
+    renderWithToken('expiredtoken')
+    await waitFor(() => expect(screen.getByRole('button', { name: /resend/i })).toBeInTheDocument())
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@example.com' } })
+    fireEvent.click(screen.getByRole('button', { name: /resend/i }))
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
   })
 })
