@@ -41,12 +41,13 @@ class ResendConfirmationIn(BaseModel):
 
 
 def _set_refresh_cookie(response: Response, token: str) -> None:
+    is_production = settings.environment == "production"
     response.set_cookie(
         key=_REFRESH_COOKIE,
         value=token,
         httponly=True,
-        secure=settings.environment == "production",
-        samesite="lax",
+        secure=is_production,
+        samesite="none" if is_production else "lax",
         max_age=_COOKIE_MAX_AGE,
     )
 
