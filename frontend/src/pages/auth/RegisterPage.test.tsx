@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { RegisterPage } from './RegisterPage'
@@ -16,23 +17,44 @@ describe('RegisterPage', () => {
 
   it('shows check-email message after successful registration', async () => {
     mockRegister.mockResolvedValue({ detail: 'Check your email to confirm your account' })
+    const user = userEvent.setup()
     render(<MemoryRouter><RegisterPage /></MemoryRouter>)
-    fireEvent.change(screen.getByLabelText(/first name/i), { target: { value: 'Alice' } })
-    fireEvent.change(screen.getByLabelText(/last name/i), { target: { value: 'Smith' } })
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'alice@example.com' } })
-    fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '555-0100' } })
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'secret123' } })
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }))
+    await user.type(screen.getByLabelText(/first name/i), 'Alice')
+    await user.type(screen.getByLabelText(/last name/i), 'Smith')
+    await user.type(screen.getByLabelText(/email/i), 'alice@example.com')
+    await user.type(screen.getByLabelText(/phone/i), '555-0100')
+    await user.type(screen.getByLabelText(/password/i), 'secret123')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
     await waitFor(() => expect(screen.getByText(/check your email/i)).toBeInTheDocument())
     expect(screen.getByText(/alice@example\.com/)).toBeInTheDocument()
   })
 
   it('shows error message when register fails', async () => {
     mockRegister.mockRejectedValueOnce(new Error('Email taken'))
+    const user = userEvent.setup()
     render(<MemoryRouter><RegisterPage /></MemoryRouter>)
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'a@b.com' } })
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'secret123' } })
-    fireEvent.submit(screen.getByRole('button', { name: /create account/i }).closest('form')!)
+    await user.type(screen.getByLabelText(/first name/i), 'Alice')
+    await user.type(screen.getByLabelText(/last name/i), 'Smith')
+    await user.type(screen.getByLabelText(/email/i), 'a@b.com')
+    await user.type(screen.getByLabelText(/phone/i), '555-0100')
+    await user.type(screen.getByLabelText(/password/i), 'secret123')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
+  })
+
+  it('disables the submit button while loading', async () => {
+    let resolve!: (v: { detail: string }) => void
+    mockRegister.mockImplementation(() => new Promise(r => { resolve = r }))
+    const user = userEvent.setup()
+    render(<MemoryRouter><RegisterPage /></MemoryRouter>)
+    await user.type(screen.getByLabelText(/first name/i), 'Alice')
+    await user.type(screen.getByLabelText(/last name/i), 'Smith')
+    await user.type(screen.getByLabelText(/email/i), 'a@b.com')
+    await user.type(screen.getByLabelText(/phone/i), '555-0100')
+    await user.type(screen.getByLabelText(/password/i), 'secret123')
+    const button = screen.getByRole('button', { name: /create account/i })
+    await user.click(button)
+    expect(button).toBeDisabled()
+    resolve({ detail: 'ok' })
   })
 })
