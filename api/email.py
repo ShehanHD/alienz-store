@@ -1,3 +1,4 @@
+import html as html_module
 import logging
 import smtplib
 from contextlib import contextmanager
@@ -27,7 +28,8 @@ def _send(to: str, subject: str, html: str) -> None:
 
 
 def send_email_confirmation(to_email: str, token: str) -> None:
-    confirm_url = f"{settings.frontend_url}/auth/confirm-email?token={token}"
+    safe_token = html_module.escape(token)
+    confirm_url = f"{settings.frontend_url}/auth/confirm-email?token={safe_token}"
     html = f"""
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
         <h2>Confirm your email address</h2>
@@ -50,26 +52,27 @@ def send_email_confirmation(to_email: str, token: str) -> None:
 def send_enquiry_notification(
     enquiry: dict, admin_email: str, product_name: str | None
 ) -> None:
+    e = html_module.escape
     product_rows = ""
     if product_name:
         product_rows = f"""
-            <tr><td><strong>Product</strong></td><td>{product_name}</td></tr>
-            <tr><td><strong>Size</strong></td><td>{enquiry.get("size") or "—"}</td></tr>
-            <tr><td><strong>Color</strong></td><td>{enquiry.get("color") or "—"}</td></tr>
+            <tr><td><strong>Product</strong></td><td>{e(product_name)}</td></tr>
+            <tr><td><strong>Size</strong></td><td>{e(enquiry.get("size") or "—")}</td></tr>
+            <tr><td><strong>Color</strong></td><td>{e(enquiry.get("color") or "—")}</td></tr>
         """
     html = f"""
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-        <h2>New enquiry from {enquiry["name"]}</h2>
+        <h2>New enquiry from {e(enquiry["name"])}</h2>
         <table style="border-collapse:collapse;width:100%;font-size:15px;">
             <tr><td style="padding:6px 12px 6px 0"><strong>Name</strong></td>
-                <td>{enquiry["name"]}</td></tr>
+                <td>{e(enquiry["name"])}</td></tr>
             <tr><td style="padding:6px 12px 6px 0"><strong>Email</strong></td>
-                <td>{enquiry["email"]}</td></tr>
+                <td>{e(enquiry["email"])}</td></tr>
             <tr><td style="padding:6px 12px 6px 0"><strong>Phone</strong></td>
-                <td>{enquiry.get("phone") or "—"}</td></tr>
+                <td>{e(enquiry.get("phone") or "—")}</td></tr>
             {product_rows}
             <tr><td style="padding:6px 12px 6px 0"><strong>Message</strong></td>
-                <td>{enquiry.get("message") or "—"}</td></tr>
+                <td>{e(enquiry.get("message") or "—")}</td></tr>
         </table>
         <p style="margin-top:24px;">
             <a href="{settings.frontend_url}/admin/enquiries">View in admin panel →</a>
@@ -80,22 +83,23 @@ def send_enquiry_notification(
 
 
 def send_enquiry_confirmation(enquiry: dict, product_name: str | None) -> None:
+    e = html_module.escape
     product_section = ""
     if product_name:
         product_section = f"""
         <p>
-            <strong>Product:</strong> {product_name}<br>
-            <strong>Size:</strong> {enquiry.get("size") or "—"}<br>
-            <strong>Color:</strong> {enquiry.get("color") or "—"}
+            <strong>Product:</strong> {e(product_name)}<br>
+            <strong>Size:</strong> {e(enquiry.get("size") or "—")}<br>
+            <strong>Color:</strong> {e(enquiry.get("color") or "—")}
         </p>
         """
     html = f"""
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
         <h2>We received your enquiry</h2>
-        <p>Hi {enquiry["name"]}, thanks for reaching out. We'll be in touch soon.</p>
+        <p>Hi {e(enquiry["name"])}, thanks for reaching out. We'll be in touch soon.</p>
         <h3 style="margin-top:24px;">Your enquiry details</h3>
         {product_section}
-        <p><strong>Message:</strong> {enquiry.get("message") or "—"}</p>
+        <p><strong>Message:</strong> {e(enquiry.get("message") or "—")}</p>
     </div>
     """
     _send(enquiry["email"], "We received your enquiry", html)
