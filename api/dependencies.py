@@ -1,13 +1,11 @@
 from typing import Any
 
-import psycopg2
 import psycopg2.extensions
-from psycopg2.extras import RealDictCursor
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 from .auth import decode_access_token
-from .config import settings
+from .db import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
@@ -33,22 +31,16 @@ def _decode_token(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
 
 def get_current_user(
     payload: dict[str, Any] = Depends(_decode_token),
+    conn: psycopg2.extensions.connection = Depends(get_db),
 ) -> dict[str, Any]:
     user_id: str = payload["sub"]
-    try:
-        conn = psycopg2.connect(dsn=settings.database_url, cursor_factory=RealDictCursor)
-    except Exception as exc:
-        raise HTTPException(status_code=503, detail="Database unavailable") from exc
-    try:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT id, email, role, first_name, last_name, is_active"
-                " FROM users WHERE id = %s",
-                (user_id,),
-            )
-            user = cur.fetchone()
-    finally:
-        conn.close()
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, email, role, first_name, last_name, is_active"
+            " FROM users WHERE id = %s",
+            (user_id,),
+        )
+        user = cur.fetchone()
 
     if user is None or not user["is_active"]:
         raise HTTPException(status_code=401, detail="Not authenticated", headers=_401)
