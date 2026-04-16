@@ -14,7 +14,7 @@ interface AuthContextValue {
   accessToken: string | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>
+  register: (email: string, password: string, firstName: string, lastName: string, phone: string) => Promise<{ detail: string }>
   logout: () => Promise<void>
   setAccessToken: (token: string | null) => void
 }
@@ -30,6 +30,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // and always reads the latest token without re-initializing the client.
   const accessTokenRef = useRef<string | null>(null)
 
+  // Stable ref for the refresh function — lets us initialize the API client
+  // synchronously (before children mount) without a chicken-and-egg problem.
+  const refreshRef = useRef<() => Promise<string | null>>(async () => null)
+
+  // Initialize the API client synchronously during render so it is ready
+  // before any child component's useEffect fires (children run effects first).
+  const clientInitialized = useRef(false)
+  if (!clientInitialized.current) {
+    initApiClient(
+      () => accessTokenRef.current,
+      () => refreshRef.current(),
+    )
+    clientInitialized.current = true
+  }
+
   // Wrapper that keeps state and ref in sync atomically
   const setAccessToken = useCallback((token: string | null) => {
     accessTokenRef.current = token
@@ -42,11 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return token
   }, [setAccessToken])
 
-  // Initialize the API client once with a stable getter and the refresh fn.
-  // Only re-initialize if `refresh` changes (it shouldn't after mount).
-  useEffect(() => {
-    initApiClient(() => accessTokenRef.current, refresh)
-  }, [refresh])
+  // Keep refreshRef pointing at the latest refresh function every render
+  refreshRef.current = refresh
 
   useEffect(() => {
     // On mount, attempt to restore session via refresh token cookie
@@ -80,12 +92,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   const register = useCallback(
-    async (email: string, password: string, firstName?: string, lastName?: string) => {
-      const result = await doRegister(email, password, firstName, lastName)
-      setAccessToken(result.access_token)
-      setUser(result.user)
+    async (email: string, password: string, firstName: string, lastName: string, phone: string) => {
+      return await doRegister(email, password, firstName, lastName, phone)
     },
-    [setAccessToken],
+    [],
   )
 
   const logout = useCallback(async () => {
