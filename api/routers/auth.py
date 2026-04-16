@@ -1,5 +1,4 @@
 import secrets
-from datetime import datetime, timezone
 from typing import Optional
 
 import psycopg2.errors
@@ -13,6 +12,7 @@ from api.auth import (
     hash_password,
     verify_password,
 )
+from api.config import settings
 from api.db import get_db
 from api.dependencies import get_config, get_current_user
 from api.email import send_email_confirmation
@@ -41,7 +41,6 @@ class ResendConfirmationIn(BaseModel):
 
 
 def _set_refresh_cookie(response: Response, token: str) -> None:
-    from api.config import settings
     response.set_cookie(
         key=_REFRESH_COOKIE,
         value=token,
@@ -61,6 +60,7 @@ def register(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Registrations are currently disabled")
 
     hashed = hash_password(body.password)
+    token = secrets.token_hex(32)
     try:
         with conn.cursor() as cur:
             cur.execute(
@@ -72,16 +72,13 @@ def register(
                 (str(body.email), hashed, body.first_name, body.last_name, body.phone),
             )
             user = dict(cur.fetchone())
+            cur.execute(
+                "INSERT INTO email_confirmations (user_id, token) VALUES (%s, %s)",
+                (str(user["id"]), token),
+            )
     except psycopg2.errors.UniqueViolation:
         conn.rollback()
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
-
-    token = secrets.token_hex(32)
-    with conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO email_confirmations (user_id, token) VALUES (%s, %s)",
-            (str(user["id"]), token),
-        )
 
     send_email_confirmation(str(body.email), token)
 
@@ -92,27 +89,32 @@ def register(
 def confirm_email(token: str, conn=Depends(get_db)) -> dict:
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT id, user_id, expires_at, used_at FROM email_confirmations WHERE token = %s",
+            """
+            UPDATE email_confirmations
+            SET used_at = NOW()
+            WHERE token = %s AND used_at IS NULL AND expires_at > NOW()
+            RETURNING user_id
+            """,
             (token,),
         )
-        row = cur.fetchone()
+        updated = cur.fetchone()
 
-    if not row:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid confirmation link")
-
-    row = dict(row)
-    if row["used_at"] is not None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Confirmation link already used")
-
-    if row["expires_at"] < datetime.now(timezone.utc):
+    if not updated:
+        # Determine why the update matched nothing
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT used_at, expires_at FROM email_confirmations WHERE token = %s",
+                (token,),
+            )
+            row = cur.fetchone()
+        if not row:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid confirmation link")
+        if row["used_at"] is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Confirmation link already used")
         raise HTTPException(status_code=410, detail="Confirmation link has expired")
 
     with conn.cursor() as cur:
-        cur.execute(
-            "UPDATE email_confirmations SET used_at = NOW() WHERE id = %s",
-            (str(row["id"]),),
-        )
-        cur.execute("UPDATE users SET is_active = TRUE WHERE id = %s", (str(row["user_id"]),))
+        cur.execute("UPDATE users SET is_active = TRUE WHERE id = %s", (str(updated["user_id"]),))
 
     return {"detail": "Email confirmed. You can now log in."}
 
