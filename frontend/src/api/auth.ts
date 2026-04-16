@@ -1,3 +1,4 @@
+import { ZodError } from 'zod'
 import { getApiClient } from './client'
 import { AuthUserSchema, MessageResponseSchema, RegisterResponseSchema, TokenResponseSchema, UserSchema } from './schemas/auth'
 import type { User } from '../types'
@@ -39,7 +40,8 @@ export async function refreshToken(): Promise<string | null> {
     const res = await getApiClient().post('/auth/refresh')
     const parsed = TokenResponseSchema.parse(res.data)
     return parsed.access_token
-  } catch {
+  } catch (err) {
+    if (err instanceof ZodError) throw err
     return null
   }
 }
