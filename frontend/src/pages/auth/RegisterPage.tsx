@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
@@ -23,8 +24,12 @@ export function RegisterPage() {
     try {
       await register(email, password, firstName, lastName, phone)
       setSubmitted(true)
-    } catch {
-      setError('Registration failed. Email may already be in use.')
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.data?.detail) {
+        setError(String(err.response.data.detail))
+      } else {
+        setError('Registration failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
