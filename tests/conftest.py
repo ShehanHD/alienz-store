@@ -96,10 +96,12 @@ def register_user(client, email: str = "user@example.com", password: str = "pass
     # Activate the user directly so tests can log in immediately
     if TEST_DATABASE_URL:
         conn = psycopg2.connect(dsn=TEST_DATABASE_URL)
-        conn.autocommit = True
-        with conn.cursor() as cur:
-            cur.execute("UPDATE users SET is_active = TRUE WHERE email = %s", (email,))
-        conn.close()
+        try:
+            conn.autocommit = True
+            with conn.cursor() as cur:
+                cur.execute("UPDATE users SET is_active = TRUE WHERE email = %s", (email,))
+        finally:
+            conn.close()
     return r.json()
 
 
