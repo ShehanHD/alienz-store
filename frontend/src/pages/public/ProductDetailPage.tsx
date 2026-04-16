@@ -55,7 +55,7 @@ export function ProductDetailPage() {
   useEffect(() => {
     if (!product?.category?.slug) return
     void getProducts({ category: product.category.slug, page_size: 5 })
-      .then((res) => setSuggested(res.results.filter((r) => r.id !== product.id).slice(0, 4)))
+      .then((res) => setSuggested(res.items.filter((r: Product) => r.id !== product.id).slice(0, 4)))
       .catch(() => {})
   }, [product?.id, product?.category?.slug])
 

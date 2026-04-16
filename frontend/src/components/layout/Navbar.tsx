@@ -77,7 +77,7 @@ export function Navbar() {
                 <span>Admin</span>
               </NavLink>
             )}
-            <button onClick={() => void confirm('Log out of your account?', { title: 'Log Out', confirmLabel: 'Log Out' }).then((ok) => ok && logout())} className={styles.logoutBtn} title="Logout">
+            <button onClick={() => void confirm('Log out of your account?', { title: 'Log Out', confirmLabel: 'Log Out' }).then((ok) => { if (ok) void logout() })} className={styles.logoutBtn} title="Logout">
               <LogOut size={14} strokeWidth={1.5} aria-hidden="true" />
               <span>Logout</span>
             </button>
@@ -121,7 +121,7 @@ export function Navbar() {
                   Admin
                 </NavLink>
               )}
-              <button onClick={() => void confirm('Log out of your account?', { title: 'Log Out', confirmLabel: 'Log Out' }).then((ok) => ok && logout())} className={`${styles.mobileLink} ${styles.mobileLinkBtn}`}>
+              <button onClick={() => void confirm('Log out of your account?', { title: 'Log Out', confirmLabel: 'Log Out' }).then((ok) => { if (ok) void logout() })} className={`${styles.mobileLink} ${styles.mobileLinkBtn}`}>
                 <LogOut size={14} strokeWidth={1.5} aria-hidden="true" />
                 Logout
               </button>
