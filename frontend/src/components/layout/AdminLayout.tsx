@@ -60,7 +60,7 @@ export function AdminLayout() {
           )}
         </div>
         <div className={styles.sidebarFooter}>
-          <Link to="/shop" className={styles.backToShop} onClick={handleNavClick}>
+          <Link to="/" className={styles.backToShop} onClick={handleNavClick}>
             <ArrowLeft size={12} strokeWidth={1.5} aria-hidden="true" />
             Shop
           </Link>

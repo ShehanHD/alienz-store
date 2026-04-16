@@ -17,6 +17,10 @@ node_modules/
 dist/
 .parcel-cache/
 
+# Keep compiled email templates (needed for Vercel deployment)
+!api/emails/dist/
+!api/emails/dist/*.html
+
 # Env
 .env
 .env.local
