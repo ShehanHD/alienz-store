@@ -79,7 +79,8 @@ def send_enquiry_notification(
         </p>
     </div>
     """
-    _send(admin_email, f"New enquiry from {enquiry['name']}", html)
+    safe_name = enquiry['name'].replace('\r', '').replace('\n', '')
+    _send(admin_email, f"New enquiry from {safe_name}", html)
 
 
 def send_enquiry_confirmation(enquiry: dict, product_name: str | None) -> None:

@@ -13,7 +13,7 @@ export function ConfirmEmailPage() {
   const token = searchParams.get('token') ?? ''
 
   const [state, setState] = useState<State>('loading')
-  const [resendEmail, setResendEmail] = useState('')
+  const [resendEmail, setResendEmail] = useState(searchParams.get('email') ?? '')
   const [resendSent, setResendSent] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
   const [resendError, setResendError] = useState('')
