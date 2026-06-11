@@ -5,12 +5,11 @@ from PIL import Image
 def process_image(
     data: bytes,
     max_width: int = 1200,
-    thumbnail_size: tuple[int, int] = (300, 300),
 ) -> tuple[bytes, bytes]:
     """
     Process an uploaded image.
     Returns (full_webp_bytes, thumbnail_webp_bytes).
-    Resizes proportionally if width > max_width. Thumbnail is a centre-cropped square.
+    Resizes proportionally if width > max_width. Thumbnail preserves original resolution and aspect ratio.
     """
     with Image.open(io.BytesIO(data)) as img:
         img = img.convert("RGB")
@@ -25,16 +24,8 @@ def process_image(
         img.save(full_buf, "WEBP", quality=85)
         full_bytes = full_buf.getvalue()
 
-        # Thumbnail: centre-crop to square, then resize
-        thumb = img.copy()
-        min_dim = min(thumb.width, thumb.height)
-        left = (thumb.width - min_dim) // 2
-        top = (thumb.height - min_dim) // 2
-        thumb = thumb.crop((left, top, left + min_dim, top + min_dim))
-        thumb = thumb.resize(thumbnail_size, Image.LANCZOS)
-
         thumb_buf = io.BytesIO()
-        thumb.save(thumb_buf, "WEBP", quality=80)
+        img.save(thumb_buf, "WEBP", quality=80)
         thumb_bytes = thumb_buf.getvalue()
 
     return full_bytes, thumb_bytes
