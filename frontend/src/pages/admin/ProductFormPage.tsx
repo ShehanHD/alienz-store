@@ -11,8 +11,9 @@ import type { RefItem, AttributeType } from '../../api/refData'
 import { Button } from '../../components/ui/Button'
 import { ImageUploader } from '../../components/ui/ImageUploader'
 import { Input } from '../../components/ui/Input'
+import { Chip } from '../../components/ui/Chip'
 import { PageLoader } from '../../components/ui/PageLoader'
-import { useToast } from '../../contexts/ToastContext'
+import { Textarea, Switch, useToast, Container, Stack, Chips } from '@shehandon/vcs-ui'
 import type { Category, Product, ProductImage } from '../../types'
 import styles from './ProductFormPage.module.css'
 
@@ -129,7 +130,7 @@ export function ProductFormPage() {
         setSavedProductId(created.id)
       }
     } catch {
-      toast('Failed to save product. Please try again.', 'error')
+      toast({ title: 'Failed to save product. Please try again.', variant: 'danger' })
       setSubmitting(false)
       return
     }
@@ -145,13 +146,13 @@ export function ProductFormPage() {
         setPendingFiles([])
       } catch {
         setPendingFiles([])
-        toast('Product saved but some images failed to upload.', 'error')
+        toast({ title: 'Product saved but some images failed to upload.', variant: 'danger' })
         setSubmitting(false)
         return
       }
     }
 
-    toast(isEdit ? 'Product updated.' : 'Product created.', 'success')
+    toast({ title: isEdit ? 'Product updated.' : 'Product created.', variant: 'success' })
     setSubmitting(false)
     navigate('/admin/products')
   }
@@ -160,22 +161,19 @@ export function ProductFormPage() {
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
-    <div className={styles.page}>
-      <h1>{isEdit ? 'Edit Product' : 'New Product'}</h1>
+    <Container size="md" padding="6">
+      <h1 className={styles.title}>{isEdit ? 'Edit Product' : 'New Product'}</h1>
 
-      <form onSubmit={(e) => void handleSubmit(e)} className={styles.form}>
+      <Stack as="form" direction="column" gap="6" onSubmit={(e) => void handleSubmit(e)}>
 
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
 
-        <div className={styles.field}>
-          <label className={styles.fieldLabel}>Description</label>
-          <textarea
-            className={styles.textarea}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={4}
-          />
-        </div>
+        <Textarea
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={4}
+        />
 
         <Input
           label="Price €"
@@ -188,72 +186,55 @@ export function ProductFormPage() {
         />
 
         {/* Category — multi-select */}
-        <div className={styles.field}>
+        <Stack direction="column" gap="2">
           <label className={styles.fieldLabel}>Categories</label>
-          <div className={styles.chips}>
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={`${styles.chip} ${categoryIds.includes(c.id) ? styles.chipActive : ''}`}
-                onClick={() => setCategoryIds(toggle(categoryIds, c.id))}
-                aria-pressed={categoryIds.includes(c.id)}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-        </div>
+          <Chips
+            mode="multiple"
+            options={categories.map((c) => ({ value: c.id, label: c.name }))}
+            value={categoryIds}
+            onChange={setCategoryIds}
+          />
+        </Stack>
 
         {/* Colors */}
         {refColors.length > 0 && (
-          <div className={styles.field}>
+          <Stack direction="column" gap="2">
             <label className={styles.fieldLabel}>Colors</label>
-            <div className={styles.colorChips}>
-              {refColors.map((c) => {
-                const active = selectedColors.includes(c.name)
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className={`${styles.colorChip} ${active ? styles.colorChipActive : ''}`}
-                    onClick={() => setSelectedColors(toggle(selectedColors, c.name))}
-                    aria-pressed={active}
-                    title={c.name}
-                  >
+            <Stack direction="row" wrap gap="2">
+              {refColors.map((c) => (
+                <Chip
+                  key={c.id}
+                  selected={selectedColors.includes(c.name)}
+                  onClick={() => setSelectedColors(toggle(selectedColors, c.name))}
+                  title={c.name}
+                  icon={
                     <span
                       className={styles.colorSwatch}
                       style={{
-                        background: c.hex ?? '#ccc',
-                        border: c.hex === '#ffffff' ? '1px solid #e8e8e8' : 'none',
+                        background: c.hex ?? 'var(--border-strong)',
+                        border: c.hex === '#ffffff' ? '1px solid var(--border)' : 'none',
                       }}
                     />
-                    <span>{c.name}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+                  }
+                >
+                  {c.name}
+                </Chip>
+              ))}
+            </Stack>
+          </Stack>
         )}
 
         {/* Sizes */}
         {refSizes.length > 0 && (
-          <div className={styles.field}>
+          <Stack direction="column" gap="2">
             <label className={styles.fieldLabel}>Sizes</label>
-            <div className={styles.chips}>
-              {refSizes.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  className={`${styles.chip} ${selectedSizes.includes(s.name) ? styles.chipActive : ''}`}
-                  onClick={() => setSelectedSizes(toggle(selectedSizes, s.name))}
-                  aria-pressed={selectedSizes.includes(s.name)}
-                >
-                  {s.name}
-                </button>
-              ))}
-            </div>
-          </div>
+            <Chips
+              mode="multiple"
+              options={refSizes.map((s) => s.name)}
+              value={selectedSizes}
+              onChange={setSelectedSizes}
+            />
+          </Stack>
         )}
 
         {/* Attributes: Model, Fit, Material, Accessory Style */}
@@ -266,27 +247,20 @@ export function ProductFormPage() {
           ] as const
         ).map(([type, selected, setSelected]) =>
           refAttributes[type].length > 0 ? (
-            <div key={type} className={styles.field}>
+            <Stack key={type} direction="column" gap="2">
               <label className={styles.fieldLabel}>{ATTRIBUTE_LABELS[type]}</label>
-              <div className={styles.chips}>
-                {refAttributes[type].map((a) => (
-                  <button
-                    key={a.id}
-                    type="button"
-                    className={`${styles.chip} ${selected.includes(a.name) ? styles.chipActive : ''}`}
-                    onClick={() => setSelected(toggle(selected, a.name))}
-                    aria-pressed={selected.includes(a.name)}
-                  >
-                    {a.name}
-                  </button>
-                ))}
-              </div>
-            </div>
+              <Chips
+                mode="multiple"
+                options={refAttributes[type].map((a) => a.name)}
+                value={selected}
+                onChange={setSelected}
+              />
+            </Stack>
           ) : null
         )}
 
         {/* Images */}
-        <div className={styles.field}>
+        <Stack direction="column" gap="2">
           <label className={styles.fieldLabel}>
             Images
             <span className={styles.fieldNote}> — max {maxImages}, up to {maxUploadMb}MB each</span>
@@ -300,38 +274,20 @@ export function ProductFormPage() {
             onImagesChange={setImages}
             onPendingChange={setPendingFiles}
           />
-        </div>
+        </Stack>
 
         {/* Toggles */}
-        <div className={styles.toggleRow}>
-          <button
-            type="button"
-            className={`${styles.toggle} ${isActive ? styles.toggleOn : ''}`}
-            onClick={() => setIsActive((v) => !v)}
-            aria-pressed={isActive}
-          >
-            <span className={styles.toggleThumb} />
-          </button>
-          <span className={styles.toggleLabel}>Active</span>
+        <Stack direction="row" align="center" gap="6">
+          <Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} label="Active" />
+          <Switch checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} label="Featured" />
+        </Stack>
 
-          <button
-            type="button"
-            className={`${styles.toggle} ${isFeatured ? styles.toggleOn : ''}`}
-            onClick={() => setIsFeatured((v) => !v)}
-            aria-pressed={isFeatured}
-            style={{ marginLeft: 'var(--space-6)' }}
-          >
-            <span className={styles.toggleThumb} />
-          </button>
-          <span className={styles.toggleLabel}>Featured</span>
-        </div>
-
-        <div className={styles.actions}>
+        <Stack direction="row" gap="3">
           <Button type="button" variant="secondary" onClick={() => navigate('/admin/products')}>Cancel</Button>
           <Button type="submit" loading={submitting}>Save</Button>
-        </div>
-      </form>
-    </div>
+        </Stack>
+      </Stack>
+    </Container>
   )
 }
 

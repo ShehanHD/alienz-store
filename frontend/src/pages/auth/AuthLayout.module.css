@@ -1,0 +1,160 @@
+/* Shared auth split-screen shell + form typography. The two-column grid,
+   form column and mobile-wordmark stack are vcs-ui Grid/Stack (AuthLayout.tsx);
+   this file holds the brand "imagery" panel (dark gradient + gold glow) and
+   all typography — none of which have a vcs-ui prop. */
+
+.split {
+  min-height: 100dvh;
+}
+
+/* ── Brand panel ── */
+.brand {
+  position: relative;
+  min-height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(154, 123, 59, 0.38), transparent 58%),
+    linear-gradient(150deg, #1c1b18 0%, #0c0c0b 100%);
+  color: #f4f1ea;
+}
+
+.brandInner {
+  min-height: 100%;
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+.wordmark {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.brandHeadline {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+}
+
+.brandSub {
+  margin-top: var(--sp-4);
+  max-width: 34ch;
+  font-size: 0.9375rem;
+  font-weight: 300;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: rgba(244, 241, 234, 0.7);
+}
+
+.brandFoot {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 234, 0.45);
+}
+
+/* ── Form panel ── */
+.formPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: clamp(2rem, 5vw, 4rem);
+  background: var(--bg);
+}
+
+.formInner {
+  width: 100%;
+  max-width: 400px;
+}
+
+.mobileWordmark {
+  display: none;
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Back-to-store nav (no navbar on auth pages). */
+.backToStore {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease);
+}
+
+.backToStore:hover {
+  color: var(--text);
+}
+
+/* ── Shared form typography ── */
+.heading {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.subheading {
+  margin-top: var(--sp-2);
+  font-size: 0.875rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.inlineLink {
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+}
+
+.error {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  color: var(--danger);
+}
+
+.foot {
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+/* ── Responsive: below md, drop the brand panel, show a small wordmark ── */
+@media (max-width: 767px) {
+  .split {
+    min-height: 0;
+  }
+  .brand {
+    display: none;
+  }
+  .mobileWordmark {
+    display: block;
+  }
+}

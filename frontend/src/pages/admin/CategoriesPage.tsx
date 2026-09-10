@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getCategories, createCategory, deleteCategory, reorderCategories, toggleCategoryNavbar } from '../../api/categories'
 import { Button } from '../../components/ui/Button'
+import { Input } from '../../components/ui/Input'
 import { PageLoader } from '../../components/ui/PageLoader'
 import { useDragSort } from '../../hooks/useDragSort'
-import { useToast } from '../../contexts/ToastContext'
+import { Switch, useToast, Box, Stack } from '@shehandon/vcs-ui'
 import { useConfirm } from '../../contexts/ConfirmContext'
 import { Trash2, Plus } from 'lucide-react'
 import type { Category } from '../../types'
@@ -55,10 +56,10 @@ export function CategoriesPage() {
     try {
       const created = await createCategory({ name: newName.trim(), sort_order: categories.length * 10 })
       setNewName('')
-      toast('Category created.', 'success')
+      toast({ title: 'Category created.', variant: 'success' })
       sync([...categories, created])
     } catch {
-      toast('Failed to create category. Please try again.', 'error')
+      toast({ title: 'Failed to create category. Please try again.', variant: 'danger' })
     } finally {
       setSubmitting(false)
     }
@@ -69,10 +70,10 @@ export function CategoriesPage() {
     if (!ok) return
     try {
       await deleteCategory(id)
-      toast('Category deleted.', 'success')
+      toast({ title: 'Category deleted.', variant: 'success' })
       sync(categories.filter((c) => c.id !== id))
     } catch {
-      toast('Failed to delete category. Please try again.', 'error')
+      toast({ title: 'Failed to delete category. Please try again.', variant: 'danger' })
     }
   }
 
@@ -87,19 +88,20 @@ export function CategoriesPage() {
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
-    <div className={styles.page}>
-      <h1>Categories</h1>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <h1 className={styles.title}>Categories</h1>
 
-      <form onSubmit={(e) => void handleCreate(e)} className={styles.form}>
-        <input
-          type="text"
+      <Stack as="form" direction="row" align="end" wrap gap="3" onSubmit={(e) => void handleCreate(e)} className={styles.form}>
+        <Input
+          label="Category name"
+          aria-label="Category name"
           placeholder="Category name"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           required
         />
         <Button type="submit" loading={submitting}><Plus size={13} strokeWidth={1.5} aria-hidden="true" /> Add</Button>
-      </form>
+      </Stack>
 
       {categories.length === 0 ? (
         <p className={styles.empty}>No categories found.</p>
@@ -133,19 +135,16 @@ export function CategoriesPage() {
                 <td className={styles.dragCell}><DragIcon /></td>
                 <td>{cat.name}</td>
                 <td className={styles.centreCell}>
-                  <button
-                    type="button"
-                    className={`${styles.toggle} ${cat.show_in_navbar ? styles.toggleOn : ''}`}
-                    onClick={() => void handleToggleNavbar(cat.id)}
-                    aria-pressed={cat.show_in_navbar}
-                  >
-                    <span className={styles.toggleThumb} />
-                  </button>
+                  <Switch
+                    checked={cat.show_in_navbar}
+                    onChange={() => void handleToggleNavbar(cat.id)}
+                    aria-label="Show in navbar"
+                  />
                 </td>
                 <td className={styles.actionsCell}>
-                  <button type="button" className={styles.iconBtnDanger} onClick={() => void handleDelete(cat.id)} title="Delete" aria-label="Delete category">
+                  <Button variant="danger" shape="square" size="sm" onClick={() => void handleDelete(cat.id)} title="Delete" aria-label="Delete category">
                     <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -153,6 +152,6 @@ export function CategoriesPage() {
         </table>
         </div>
       )}
-    </div>
+    </Box>
   )
 }

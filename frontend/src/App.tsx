@@ -1,8 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ToastProvider } from '@shehandon/vcs-ui'
 import { AuthProvider } from './contexts/AuthContext'
-import { ToastProvider } from './contexts/ToastContext'
 import { ConfirmProvider } from './contexts/ConfirmContext'
-import { ToastContainer } from './components/ui/Toast'
 import { ConfirmDialog } from './components/ui/ConfirmDialog'
 import { RequireAuth } from './components/guards/RequireAuth'
 import { RequireAdmin } from './components/guards/RequireAdmin'
@@ -41,15 +40,17 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/maintenance" element={<MaintenancePage />} />
+              {/* Auth pages render standalone (no navbar/footer) — the
+                  split-screen AuthLayout is a full-viewport experience. */}
+              <Route path="/auth/login" element={<LoginPage />} />
+              <Route path="/auth/register" element={<RegisterPage />} />
+              <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/auth/confirm-email" element={<ConfirmEmailPage />} />
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/shop" element={<ShopPage />} />
                 <Route path="/shop/:slug" element={<ProductDetailPage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/auth/login" element={<LoginPage />} />
-                <Route path="/auth/register" element={<RegisterPage />} />
-                <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/auth/confirm-email" element={<ConfirmEmailPage />} />
                 <Route element={<RequireAuth />}>
                   <Route path="/account" element={<AccountDashboardPage />} />
                   <Route path="/account/orders" element={<OrdersPage />} />
@@ -76,7 +77,6 @@ export default function App() {
               </Route>
             </Routes>
           </BrowserRouter>
-          <ToastContainer />
           <ConfirmDialog />
         </AuthProvider>
       </ConfirmProvider>

@@ -1,0 +1,10 @@
+/* Fade-in-on-load treatment — no vcs-ui image component exists. */
+.image {
+  background: var(--bg-subtle);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.loaded {
+  opacity: 1;
+}

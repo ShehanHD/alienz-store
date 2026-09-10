@@ -1,16 +1,19 @@
-/* ── Hero — full bleed, outside the page container ── */
+/* Residual home styling: the full-bleed hero carousel (absolute-positioned
+   slides, overlay, arrows, dots) and featured-section typography — none of
+   which have a vcs-ui equivalent. Page width/centering + product grid live on
+   vcs-ui Container/Grid (HomePage.tsx). */
+
 .hero {
   position: relative;
-  width: 100%;
-  height: 560px;
+  height: 78vh;
+  min-height: 460px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  margin-bottom: var(--space-16);
+  border-radius: 0;
 }
 
-/* Carousel */
 .carousel {
   position: absolute;
   inset: 0;
@@ -19,7 +22,7 @@
 .carouselFallback {
   position: absolute;
   inset: 0;
-  background: #111;
+  background: var(--bg-inset);
 }
 
 .carouselSlide {
@@ -28,7 +31,7 @@
   background-size: cover;
   background-position: center;
   opacity: 0;
-  transition: opacity 0.9s ease;
+  transition: opacity 1s ease;
 }
 
 .carouselSlideActive {
@@ -38,131 +41,228 @@
 .carouselOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.42);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.5));
 }
 
-/* Arrow buttons */
-.carouselArrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  cursor: pointer;
-  transition: background var(--transition);
-  z-index: 2;
-}
-
-.carouselArrow:hover { background: rgba(255, 255, 255, 0.22); }
-.carouselArrowLeft  { left: var(--space-6); }
-.carouselArrowRight { right: var(--space-6); }
-
-/* Dot indicators */
-.carouselDots {
-  position: absolute;
-  bottom: var(--space-6);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: var(--space-2);
-  z-index: 2;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.dotActive {
-  background: #ffffff;
-  border-color: #ffffff;
-}
-
-/* Hero text */
 .heroContent {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
-  padding: 0 var(--space-8);
   color: #ffffff;
+  padding: 0 var(--sp-6);
 }
 
 .heroContent h1 {
-  font-family: var(--font-heading);
-  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 5rem);
   font-weight: 400;
-  letter-spacing: -0.01em;
   line-height: 1.05;
+  letter-spacing: 0.02em;
   color: #ffffff;
-  margin-bottom: var(--space-4);
 }
 
 .heroContent p {
-  font-size: 0.8125rem;
+  margin-top: var(--sp-4);
+  font-size: clamp(0.875rem, 2vw, 1.125rem);
   font-weight: 300;
-  letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: var(--space-8);
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .cta {
   display: inline-block;
-  padding: 0.75rem 2.5rem;
-  background: transparent;
+  margin-top: var(--sp-8);
+  padding: 0.85rem 2.5rem;
+  border: 1px solid #ffffff;
   color: #ffffff;
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.cta:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: #ffffff;
-}
-
-/* ── Below-hero content ── */
-.page {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 var(--space-8) var(--space-24);
-}
-
-.featured h2 {
-  font-family: var(--font-heading);
   font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-8);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-6);
-  background: transparent;
+.cta:hover {
+  background: #ffffff;
+  color: var(--text);
+}
+
+.carouselArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+
+.carouselArrow:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.carouselArrowLeft { left: var(--sp-4); }
+.carouselArrowRight { right: var(--sp-4); }
+
+.carouselDots {
+  position: absolute;
+  bottom: var(--sp-6);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease);
+}
+
+.dotActive {
+  background: #ffffff;
+}
+
+.featured {
+  margin: var(--sp-16) 0;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--sp-8);
+}
+
+.featuredHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-8);
+}
+
+.featuredHeader .sectionTitle {
+  margin-bottom: 0;
+}
+
+.carouselArrows {
+  display: flex;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.arrowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.arrowBtn:hover:not(:disabled) {
+  background: var(--glass-bg);
+  border-color: var(--text);
+}
+
+.arrowBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Desktop shows a grid, not a carousel — no arrows needed. */
+@media (min-width: 1024px) {
+  .carouselArrows {
+    display: none;
+  }
+}
+
+/* Featured layout: a horizontal, snap-scrolling carousel on tablet/mobile that
+   turns into a multi-row 4-column grid on desktop. Same DOM (product cards +
+   the "See more" tile) reflows via CSS — "See more" is the last child, so it
+   lands at the end of the carousel and at the end of the grid. */
+.featuredScroller {
+  display: flex;
+  gap: var(--sp-6);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-left: var(--sp-1);
+  padding-bottom: var(--sp-3);
+}
+
+.featuredScroller > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 72%; /* mobile: ~1.3 cards peek to signal scrollability */
+}
+
+@media (min-width: 640px) {
+  .featuredScroller > * { width: 42%; }
+}
+
+@media (min-width: 768px) {
+  .featuredScroller > * { width: 30%; }
+}
+
+/* Desktop: multi-row grid, no horizontal scroll. */
+@media (min-width: 1024px) {
+  .featuredScroller {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: visible;
+    scroll-snap-type: none;
+    padding-bottom: 0;
+  }
+  .featuredScroller > * { width: auto; }
+}
+
+/* "See more" tile — the last tile after the featured products, matching the
+   product card's 3/4 image area, and links to the shop. */
+.seeMore {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.seeMoreInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.seeMore:hover .seeMoreInner {
+  background: var(--glass-bg);
+  border-color: var(--text);
 }

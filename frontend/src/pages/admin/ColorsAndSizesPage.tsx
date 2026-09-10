@@ -9,6 +9,7 @@ import { Input } from '../../components/ui/Input'
 import { PageLoader } from '../../components/ui/PageLoader'
 import { useDragSort } from '../../hooks/useDragSort'
 import { useConfirm } from '../../contexts/ConfirmContext'
+import { Box, Stack } from '@shehandon/vcs-ui'
 import { Trash2, Plus } from 'lucide-react'
 import styles from './ColorsAndSizesPage.module.css'
 
@@ -64,25 +65,23 @@ function ColorsSection({ initialItems, onAdd, onDelete }: ColorSectionProps) {
   }
 
   return (
-    <section className={styles.section}>
-      <h2>Colors</h2>
+    <Box as="section" mb="12">
+      <h2 className={styles.sectionTitle}>Colors</h2>
       {addError && <p role="alert" className={styles.error}>{addError}</p>}
 
-      <form onSubmit={(e) => void handleAdd(e)} className={styles.colorForm}>
-        <div className={styles.colorPickerWrap}>
+      <Stack as="form" direction="row" align="end" wrap gap="4" onSubmit={(e) => void handleAdd(e)} className={styles.colorForm}>
+        <Stack direction="column" gap="2">
           <label className={styles.colorPickerLabel}>Colour</label>
-          <div className={styles.colorPickerRow}>
+          <Stack direction="row" align="center" gap="3" className={styles.colorPickerRow}>
             <input type="color" className={styles.colorPicker} value={hex} onChange={(e) => setHex(e.target.value)} aria-label="Pick colour" />
             <span className={styles.colorHex}>{hex}</span>
-          </div>
-        </div>
-        <div className={styles.colorNameWrap}>
+          </Stack>
+        </Stack>
+        <Box className={styles.colorNameWrap}>
           <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Midnight Black" required />
-        </div>
-        <div className={styles.colorAddBtn}>
-          <Button type="submit" loading={submitting}><Plus size={13} strokeWidth={1.5} aria-hidden="true" /> Add</Button>
-        </div>
-      </form>
+        </Box>
+        <Button type="submit" loading={submitting}><Plus size={13} strokeWidth={1.5} aria-hidden="true" /> Add</Button>
+      </Stack>
 
       {items.length === 0 ? (
         <p className={styles.empty}>No colors added yet.</p>
@@ -122,9 +121,9 @@ function ColorsSection({ initialItems, onAdd, onDelete }: ColorSectionProps) {
                 <td>{item.name}</td>
                 <td className={styles.hexCell}>{item.hex}</td>
                 <td className={styles.actionsCell}>
-                  <button type="button" className={styles.iconBtnDanger} onClick={() => void onDelete(item.id)} title="Delete" aria-label="Delete">
+                  <Button variant="danger" shape="square" size="sm" onClick={() => void onDelete(item.id)} title="Delete" aria-label="Delete">
                     <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -132,7 +131,7 @@ function ColorsSection({ initialItems, onAdd, onDelete }: ColorSectionProps) {
         </table>
         </div>
       )}
-    </section>
+    </Box>
   )
 }
 
@@ -173,14 +172,14 @@ function SizesSection({ initialItems, onAdd, onDelete }: SizeSectionProps) {
   }
 
   return (
-    <section className={styles.section}>
-      <h2>Sizes</h2>
+    <Box as="section" mb="12">
+      <h2 className={styles.sectionTitle}>Sizes</h2>
       {addError && <p role="alert" className={styles.error}>{addError}</p>}
 
-      <form onSubmit={(e) => void handleAdd(e)} className={styles.form}>
+      <Stack as="form" direction="row" align="end" wrap gap="3" onSubmit={(e) => void handleAdd(e)} className={styles.form}>
         <Input label="New size" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. M, 42, One Size" required />
         <Button type="submit" loading={submitting}><Plus size={13} strokeWidth={1.5} aria-hidden="true" /> Add</Button>
-      </form>
+      </Stack>
 
       {items.length === 0 ? (
         <p className={styles.empty}>No sizes added yet.</p>
@@ -212,9 +211,9 @@ function SizesSection({ initialItems, onAdd, onDelete }: SizeSectionProps) {
                 <td className={styles.dragCell}><DragIcon /></td>
                 <td>{item.name}</td>
                 <td className={styles.actionsCell}>
-                  <button type="button" className={styles.iconBtnDanger} onClick={() => void onDelete(item.id)} title="Delete" aria-label="Delete">
+                  <Button variant="danger" shape="square" size="sm" onClick={() => void onDelete(item.id)} title="Delete" aria-label="Delete">
                     <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -222,7 +221,7 @@ function SizesSection({ initialItems, onAdd, onDelete }: SizeSectionProps) {
         </table>
         </div>
       )}
-    </section>
+    </Box>
   )
 }
 
@@ -274,10 +273,10 @@ export function ColorsAndSizesPage() {
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
-    <div className={styles.page}>
-      <h1>Colors &amp; Sizes</h1>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <h1 className={styles.title}>Colors &amp; Sizes</h1>
       <ColorsSection initialItems={colors} onAdd={handleAddColor} onDelete={handleDeleteColor} />
       <SizesSection initialItems={sizes} onAdd={handleAddSize} onDelete={handleDeleteSize} />
-    </div>
+    </Box>
   )
 }

@@ -1,125 +1,34 @@
-.page {
-  padding: var(--space-12) var(--space-8);
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: var(--space-6) var(--space-4);
-  }
-}
-
-.page h1 {
-  font-family: var(--font-heading);
+/* Residual admin-clients styling: title typography, search-field sizing,
+   error text. Page padding, search row and pagination row live on vcs-ui
+   Box/Stack (ClientsPage.tsx). */
+.title {
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 400;
   letter-spacing: 0.02em;
-  margin-bottom: var(--space-8);
-  padding-bottom: var(--space-6);
+  margin-bottom: var(--sp-8);
+  padding-bottom: var(--sp-6);
   border-bottom: 1px solid var(--border);
 }
 
 .searchForm {
-  display: flex;
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--sp-8);
+  max-width: 420px;
 }
 
-.searchForm input {
-  padding: 0.75rem var(--space-3);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  font-weight: 300;
+.searchForm > *:first-child {
   flex: 1;
-  max-width: 360px;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  transition: border-color var(--transition);
-}
-
-.searchForm input:focus {
-  outline: none;
-  border-color: var(--text-primary);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-}
-
-.table th {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  font-size: 0.5625rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-}
-
-.table td {
-  text-align: left;
-  padding: var(--space-4) var(--space-4);
-  border-bottom: 1px solid var(--border);
-  font-weight: 300;
-}
-
-.actions {
-  display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.pageBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border-dark);
-  background: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: border-color var(--transition), color var(--transition);
-}
-
-.pageBtn:hover {
-  border-color: var(--text-primary);
-  color: var(--text-primary);
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-8);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-/* Table scroll wrapper */
-.tableWrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-@media (max-width: 768px) {
-  .pageBtn {
-    min-width: 44px;
-    min-height: 44px;
-  }
 }
 
 .error {
-  color: var(--error);
+  color: var(--danger);
   font-size: 0.6875rem;
   letter-spacing: 0.05em;
-  margin-bottom: var(--space-6);
-  padding: var(--space-4);
-  border: 1px solid var(--error);
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-4);
+  border: 1px solid var(--danger);
+}
+
+.pagination {
+  margin-top: var(--sp-8);
 }

@@ -1,9 +1,9 @@
-import styles from './PageLoader.module.css'
+import { Spinner, Center } from '@shehandon/vcs-ui'
 
 export function PageLoader() {
   return (
-    <div className={styles.overlay} role="status" aria-label="Loading">
-      <div className={styles.spinner} />
-    </div>
+    <Center minHeight="40vh" role="status" aria-label="Loading">
+      <Spinner size="lg" />
+    </Center>
   )
 }

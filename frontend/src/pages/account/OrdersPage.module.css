@@ -1,69 +1,31 @@
-.container {
-  max-width: 800px;
-  margin: var(--space-16) auto;
-  padding: 0 var(--space-8);
-}
-
-@media (max-width: 768px) {
-  .container {
-    margin: var(--space-8) auto;
-    padding: 0 var(--space-4);
-  }
-}
-
+/* Residual orders styling: typography, list-item divider, status pill. Page
+   container + list column live on vcs-ui Container/Stack/Box. */
 .title {
-  font-family: var(--font-heading);
+  font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 400;
   letter-spacing: 0.02em;
-  margin-bottom: var(--space-12);
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-8);
 }
 
-.empty {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  font-weight: 300;
-  letter-spacing: 0.06em;
-}
-
-.error {
-  color: var(--error);
-  font-size: 0.6875rem;
-  letter-spacing: 0.05em;
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.error { font-size: 0.75rem; color: var(--danger); }
+.empty { color: var(--text-muted); letter-spacing: 0.04em; }
 
 .item {
-  padding: var(--space-6) 0;
   border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
 }
 
 .meta {
+  margin-top: var(--sp-2);
   font-size: 0.75rem;
-  font-weight: 300;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  margin-top: var(--space-2);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
 .status {
-  display: inline-block;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.5625rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1px solid var(--border-dark);
-  color: var(--text-secondary);
-  background: transparent;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 500;
 }

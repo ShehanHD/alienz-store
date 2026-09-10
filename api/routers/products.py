@@ -88,12 +88,15 @@ def list_products(
     max_price: Optional[float] = Query(None, ge=0),
     color: Optional[str] = Query(None),
     size: Optional[str] = Query(None),
+    featured: Optional[bool] = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(12, ge=1, le=50),
     conn=Depends(get_db),
 ):
     params: list = []
     where = "WHERE p.is_active = TRUE"
+    if featured:
+        where += " AND p.is_featured = TRUE"
     if category:
         where += " AND EXISTS (SELECT 1 FROM categories cx WHERE cx.id = ANY(p.category_ids) AND cx.slug = %s)"
         params.append(category)

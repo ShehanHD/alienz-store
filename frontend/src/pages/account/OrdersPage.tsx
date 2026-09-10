@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Container, Stack, Box } from '@shehandon/vcs-ui'
 import { getMyEnquiries } from '../../api/enquiries'
+import { PageLoader } from '../../components/ui/PageLoader'
 import type { Enquiry } from '../../types'
 import styles from './OrdersPage.module.css'
 
@@ -16,30 +18,30 @@ export function OrdersPage() {
   }, [])
 
   return (
-    <div className={styles.container}>
+    <Container size="md" padding="6">
       <h1 className={styles.title}>My Enquiries</h1>
       {error && (
         <p className={styles.error} role="alert">
           {error}
         </p>
       )}
-      {loading && <p>Loading…</p>}
+      {loading && <PageLoader />}
       {!loading && !error && enquiries.length === 0 && (
         <p className={styles.empty}>No orders yet.</p>
       )}
       {!loading && !error && enquiries.length > 0 && (
-        <ul className={styles.list}>
+        <Stack direction="column" gap="0">
           {enquiries.map((enq) => (
-            <li key={enq.id} className={styles.item}>
+            <Box key={enq.id} py="6" className={styles.item}>
               <p>{enq.message}</p>
               <p className={styles.meta}>
                 <span className={styles.status}>{enq.status}</span>{' '}
                 {new Date(enq.created_at).toLocaleDateString()}
               </p>
-            </li>
+            </Box>
           ))}
-        </ul>
+        </Stack>
       )}
-    </div>
+    </Container>
   )
 }

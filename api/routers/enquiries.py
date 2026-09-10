@@ -132,27 +132,39 @@ def list_enquiries(
     params: list = []
 
     if status:
-        conditions.append("status = %s")
+        conditions.append("e.status = %s")
         params.append(status)
 
     if search:
         conditions.append(
-            "(name ILIKE %s OR email ILIKE %s OR phone ILIKE %s OR message ILIKE %s)"
+            "(e.name ILIKE %s OR e.email ILIKE %s OR e.phone ILIKE %s OR e.message ILIKE %s)"
         )
         term = f"%{search}%"
         params.extend([term, term, term, term])
 
     where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
-    order = f" ORDER BY {order_by} {order_dir}"
+    order = f" ORDER BY e.{order_by} {order_dir}"
     offset = (page - 1) * page_size
 
     with conn.cursor() as cur:
         cur.execute(
-            f"SELECT * FROM enquiries{where}{order} LIMIT %s OFFSET %s",
+            f"""
+            SELECT e.*,
+                   p.name AS product_name,
+                   p.slug AS product_slug,
+                   (SELECT pi.url FROM product_images pi
+                    WHERE pi.product_id = p.id
+                    ORDER BY pi.sort_order ASC
+                    LIMIT 1) AS product_thumbnail_url
+            FROM enquiries e
+            LEFT JOIN products p ON p.id = e.product_id
+            {where}{order}
+            LIMIT %s OFFSET %s
+            """,
             params + [page_size, offset],
         )
         items = [dict(r) for r in cur.fetchall()]
-        cur.execute(f"SELECT COUNT(*) AS total FROM enquiries{where}", params)
+        cur.execute(f"SELECT COUNT(*) AS total FROM enquiries e{where}", params)
         total = cur.fetchone()["total"]
 
     return {"items": items, "total": total, "page": page, "page_size": page_size}

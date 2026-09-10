@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Input, Box } from '@shehandon/vcs-ui'
 import { getSiteConfig, updateSiteConfig } from '../../api/admin'
 import { Button } from '../../components/ui/Button'
 import { PageLoader } from '../../components/ui/PageLoader'
@@ -45,8 +46,8 @@ export function SettingsPage() {
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
-    <div className={styles.page}>
-      <h1>Site Settings</h1>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <h1 className={styles.title}>Site Settings</h1>
 
       {saveError && <p role="alert" className={styles.error}>{saveError}</p>}
       {saveSuccess && <p className={styles.success}>Setting saved successfully.</p>}
@@ -68,8 +69,8 @@ export function SettingsPage() {
               <tr key={config.key}>
                 <td>{config.key}</td>
                 <td>
-                  <input
-                    type="text"
+                  <Input
+                    aria-label={config.key}
                     value={values[config.key] ?? ''}
                     onChange={(e) =>
                       setValues((prev) => ({ ...prev, [config.key]: e.target.value }))
@@ -85,6 +86,6 @@ export function SettingsPage() {
         </table>
         </div>
       )}
-    </div>
+    </Box>
   )
 }

@@ -1,13 +1,50 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Pencil, Trash2, ChevronLeft, ChevronRight, Star, Eye, EyeOff } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Pencil, Eye, EyeOff, Star, Plus } from 'lucide-react'
+import { DataGrid, Pagination, useToast, Box, Stack } from '@shehandon/vcs-ui'
+import type { ColumnDef } from '@shehandon/vcs-ui'
 
 import { getAdminProducts, deleteProduct } from '../../api/admin'
 import { PageLoader } from '../../components/ui/PageLoader'
-import { useToast } from '../../contexts/ToastContext'
-import { useConfirm } from '../../contexts/ConfirmContext'
 import type { PaginatedResponse, Product } from '../../types'
 import styles from './ProductsPage.module.css'
+
+// DataGrid's Row type requires a string index signature, which our domain
+// types intentionally don't declare. The intersection is structurally true
+// (unknown-typed access to any extra key is harmless) — TS just can't see it
+// without help, so this cast is a known/documented exception, not a lie.
+type ProductRow = Product & Record<string, unknown>
+
+const columns: ColumnDef<ProductRow>[] = [
+  { field: 'name', header: 'Name', type: 'string' },
+  {
+    field: 'price',
+    header: 'Price',
+    type: 'number',
+    align: 'right',
+    renderCell: (value) => `€${(value as number).toFixed(2)}`,
+  },
+  {
+    field: 'is_active',
+    header: 'Active',
+    align: 'center',
+    renderCell: (value) => (
+      value
+        ? <Eye size={14} strokeWidth={1.5} className={styles.iconOn} aria-label="Active" />
+        : <EyeOff size={14} strokeWidth={1.5} className={styles.iconOff} aria-label="Inactive" />
+    ),
+  },
+  {
+    field: 'is_featured',
+    header: 'Featured',
+    align: 'center',
+    renderCell: (value) => (
+      value
+        ? <Star size={14} strokeWidth={1.5} className={styles.iconOn} fill="currentColor" aria-label="Featured" />
+        : <Star size={14} strokeWidth={1.5} className={styles.iconOff} aria-label="Not featured" />
+    ),
+  },
+]
 
 export function ProductsPage() {
   const [data, setData] = useState<PaginatedResponse<Product> | null>(null)
@@ -15,7 +52,7 @@ export function ProductsPage() {
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const { toast } = useToast()
-  const confirm = useConfirm()
+  const navigate = useNavigate()
 
   function load(p: number) {
     setLoading(true)
@@ -28,15 +65,13 @@ export function ProductsPage() {
 
   useEffect(() => { load(page) }, [page])
 
-  async function handleDelete(id: string) {
-    const ok = await confirm('Delete this product? This cannot be undone.', { title: 'Delete Product', confirmLabel: 'Delete', variant: 'danger' })
-    if (!ok) return
+  async function handleDelete(product: Product) {
     try {
-      await deleteProduct(id)
-      toast('Product deleted.', 'success')
-      setData((prev) => prev ? { ...prev, items: prev.items.filter((p) => p.id !== id), total: prev.total - 1 } : prev)
+      await deleteProduct(product.id)
+      toast({ title: 'Product deleted.', variant: 'success' })
+      setData((prev) => prev ? { ...prev, items: prev.items.filter((p) => p.id !== product.id), total: prev.total - 1 } : prev)
     } catch {
-      toast('Failed to delete product. Please try again.', 'error')
+      toast({ title: 'Failed to delete product. Please try again.', variant: 'danger' })
     }
   }
 
@@ -46,84 +81,47 @@ export function ProductsPage() {
   const items = data?.items ?? []
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1>Products</h1>
-        <Link to="/admin/products/new" className={styles.addButton}>Add Product</Link>
-      </div>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <Box className={styles.header}>
+        <h1 className={styles.title}>Products</h1>
+      </Box>
 
-      {items.length === 0 ? (
-        <p>No products found.</p>
-      ) : (
-        <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <colgroup>
-            <col className={styles.colName} />
-            <col className={styles.colNarrow} />
-            <col className={styles.colNarrow} />
-            <col className={styles.colNarrow} />
-            <col className={styles.colActions} />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Active</th>
-              <th>Featured</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((product) => (
-              <tr key={product.id}>
-                <td>{product.name}</td>
-                <td>€{product.price.toFixed(2)}</td>
-                <td>
-                  {product.is_active
-                    ? <Eye size={14} strokeWidth={1.5} className={styles.iconOn} aria-label="Active" />
-                    : <EyeOff size={14} strokeWidth={1.5} className={styles.iconOff} aria-label="Inactive" />}
-                </td>
-                <td>
-                  {product.is_featured
-                    ? <Star size={14} strokeWidth={1.5} className={styles.iconOn} fill="currentColor" aria-label="Featured" />
-                    : <Star size={14} strokeWidth={1.5} className={styles.iconOff} aria-label="Not featured" />}
-                </td>
-                <td className={styles.actions}>
-                  <Link to={`/admin/products/${product.id}`} className={styles.iconBtn} title="Edit product">
-                    <Pencil size={14} strokeWidth={1.5} aria-hidden="true" />
-                  </Link>
-                  <button
-                    type="button"
-                    className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
-                    onClick={() => void handleDelete(product.id)}
-                    title="Delete product"
-                    aria-label="Delete product"
-                  >
-                    <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        </div>
-      )}
+      <DataGrid<ProductRow>
+        rows={items as ProductRow[]}
+        columns={columns}
+        options={{
+          pagination: false,
+          emptyMessage: 'No products found.',
+          rowActions: {
+            onDelete: (row) => void handleDelete(row),
+            extra: [{
+              label: 'Edit',
+              icon: <Pencil size={14} strokeWidth={1.5} />,
+              onClick: (row) => navigate(`/admin/products/${row.id}`),
+            }],
+          },
+          confirmDelete: {
+            title: 'Delete Product',
+            message: 'Delete this product? This cannot be undone.',
+            confirmLabel: 'Delete',
+          },
+          primaryAction: {
+            label: 'Add Product',
+            icon: <Plus size={14} strokeWidth={1.5} />,
+            onClick: () => navigate('/admin/products/new'),
+          },
+        }}
+      />
 
       {data && data.total > data.page_size && (
-        <div className={styles.pagination}>
-          {page > 1 && (
-            <button type="button" className={styles.pageBtn} onClick={() => setPage((p) => p - 1)} aria-label="Previous page">
-              <ChevronLeft size={14} strokeWidth={1.5} />
-            </button>
-          )}
-          <span>Page {page}</span>
-          {data.total > page * data.page_size && (
-            <button type="button" className={styles.pageBtn} onClick={() => setPage((p) => p + 1)} aria-label="Next page">
-              <ChevronRight size={14} strokeWidth={1.5} />
-            </button>
-          )}
-        </div>
+        <Stack direction="row" justify="center" className={styles.pagination}>
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(data.total / data.page_size)}
+            onChange={setPage}
+          />
+        </Stack>
       )}
-    </div>
+    </Box>
   )
 }

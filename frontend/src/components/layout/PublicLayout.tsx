@@ -1,15 +1,16 @@
 import { Outlet } from 'react-router-dom'
+import { Stack, Box } from '@shehandon/vcs-ui'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
 
 export function PublicLayout() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
+    <Stack direction="column" gap="0" style={{ minHeight: '100dvh' }}>
       <Navbar />
-      <main style={{ flex: 1 }}>
+      <Box as="main" style={{ flex: 1 }}>
         <Outlet />
-      </main>
+      </Box>
       <Footer />
-    </div>
+    </Stack>
   )
 }

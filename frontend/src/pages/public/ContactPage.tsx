@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Textarea, Container, Stack } from '@shehandon/vcs-ui'
 import { submitEnquiry } from '../../api/enquiries'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
@@ -26,21 +27,22 @@ export function ContactPage() {
     }
   }
 
-  if (sent) return <div className={styles.page}><p className={styles.success}>Thanks! We&apos;ll be in touch.</p></div>
+  if (sent) return (
+    <Container size="sm" padding="6">
+      <p className={styles.success}>Thanks! We&apos;ll be in touch.</p>
+    </Container>
+  )
 
   return (
-    <div className={styles.page}>
-      <h1>Contact</h1>
-      <form onSubmit={(e) => void handleSubmit(e)} className={styles.form}>
+    <Container size="sm" padding="6">
+      <h1 className={styles.title}>Contact</h1>
+      <Stack as="form" direction="column" gap="6" onSubmit={(e) => void handleSubmit(e)}>
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <div className={styles.field}>
-          <label htmlFor="message">Message</label>
-          <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} required rows={5} />
-        </div>
+        <Textarea label="Message" value={message} onChange={(e) => setMessage(e.target.value)} required rows={5} />
         {error && <p className={styles.error}>{error}</p>}
         <Button type="submit" loading={loading}>Send Message</Button>
-      </form>
-    </div>
+      </Stack>
+    </Container>
   )
 }

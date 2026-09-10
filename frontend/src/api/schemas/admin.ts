@@ -9,9 +9,22 @@ export const AdminDashboardSchema = z.object({
   enquiries: z.object({
     total: z.number().int(),
     new: z.number().int(),
+    // Added stats — defaulted so a not-yet-redeployed backend still parses.
+    by_status: z.object({
+      new: z.number().int(),
+      read: z.number().int(),
+      accepted: z.number().int(),
+      rejected: z.number().int(),
+    }).default({ new: 0, read: 0, accepted: 0, rejected: 0 }),
+    last_14_days: z.array(z.object({
+      date: z.string(),
+      count: z.number().int(),
+    })).default([]),
   }),
   clients: z.object({
     total: z.number().int(),
+    new_30d: z.number().int().default(0),
+    prev_30d: z.number().int().default(0),
   }),
   storage: z.object({
     quota_mb: z.number().int(),

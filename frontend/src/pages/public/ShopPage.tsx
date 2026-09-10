@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { SlidersHorizontal, ChevronDown } from 'lucide-react'
+import { Slider, Pagination, Box, Stack, Grid, Divider, Chips } from '@shehandon/vcs-ui'
 import { getProducts, getProductFilters } from '../../api/products'
 import type { ProductFilterColor } from '../../api/products'
 import { getCategories } from '../../api/categories'
 import { ProductCard } from '../../components/ui/ProductCard'
-import { PriceRangeSlider } from '../../components/ui/PriceRangeSlider'
-import { Spinner } from '../../components/ui/Spinner'
+import { ProductCardSkeleton } from '../../components/ui/ProductCardSkeleton'
+import { Chip } from '../../components/ui/Chip'
+import { Button } from '../../components/ui/Button'
 import type { Category, PaginatedResponse, Product } from '../../types'
 import styles from './ShopPage.module.css'
 
@@ -116,8 +118,8 @@ export function ShopPage() {
   const clearFilters = () => { setDraft(EMPTY_FILTERS); setParams({}); setFilterOpen(false) }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.toolbar}>
+    <Box className={styles.page}>
+      <Stack direction="row" className={styles.toolbar}>
         <div className={styles.filterWrap}>
           <button
             ref={triggerRef}
@@ -134,117 +136,136 @@ export function ShopPage() {
 
           {filterOpen && (
             <div ref={dialogRef} className={styles.filterDialog} role="dialog" aria-label="Filters">
+              <Stack direction="column" gap="6">
 
-              {/* Category */}
-              <section className={styles.filterSection}>
-                <p className={styles.filterSectionLabel}>Category</p>
-                <div className={styles.chips}>
-                  <button className={`${styles.chip} ${!draft.category ? styles.chipActive : ''}`} onClick={() => setDraft((d) => ({ ...d, category: undefined }))}>All</button>
-                  {categories.map((c) => (
-                    <button key={c.id} className={`${styles.chip} ${draft.category === c.slug ? styles.chipActive : ''}`} onClick={() => setDraft((d) => ({ ...d, category: c.slug }))}>{c.name}</button>
-                  ))}
-                </div>
-              </section>
+                {/* Category */}
+                <Stack direction="column" gap="3">
+                  <p className={styles.filterSectionLabel}>Category</p>
+                  <Chips
+                    mode="single"
+                    options={[
+                      { value: '', label: 'All' },
+                      ...categories.map((c) => ({ value: c.slug, label: c.name })),
+                    ]}
+                    value={[draft.category ?? '']}
+                    onChange={(v) => setDraft((d) => ({ ...d, category: v[0] || undefined }))}
+                  />
+                </Stack>
 
-              <div className={styles.divider} />
+                <Divider />
 
-              {/* Price range */}
-              <section className={styles.filterSection}>
-                <p className={styles.filterSectionLabel}>Price Range</p>
-                <PriceRangeSlider
-                  min={PRICE_MIN} max={PRICE_MAX}
-                  valueMin={draft.minPrice} valueMax={draft.maxPrice}
-                  onChange={(min, max) => setDraft((d) => ({ ...d, minPrice: min, maxPrice: max }))}
-                />
-              </section>
+                {/* Price range */}
+                <Stack direction="column" gap="3">
+                  <p className={styles.filterSectionLabel}>Price Range</p>
+                  <Stack direction="column" gap="4">
+                    <Slider
+                      label="Min Price"
+                      min={PRICE_MIN}
+                      max={PRICE_MAX}
+                      step={10}
+                      value={draft.minPrice}
+                      onChange={(v) => setDraft((d) => ({ ...d, minPrice: Math.min(v, d.maxPrice) }))}
+                      showValue
+                      formatValue={(v) => `€${v}`}
+                    />
+                    <Slider
+                      label="Max Price"
+                      min={PRICE_MIN}
+                      max={PRICE_MAX}
+                      step={10}
+                      value={draft.maxPrice}
+                      onChange={(v) => setDraft((d) => ({ ...d, maxPrice: Math.max(v, d.minPrice) }))}
+                      showValue
+                      formatValue={(v) => `€${v}`}
+                    />
+                  </Stack>
+                </Stack>
 
-              <div className={styles.divider} />
-
-              {/* Colour */}
-              {availableColors.length > 0 && (
-                <>
-                  <section className={styles.filterSection}>
-                    <p className={styles.filterSectionLabel}>Colour</p>
-                    <div className={styles.colorGrid}>
-                      {availableColors.map(({ name, hex }) => {
-                        const isActive = draft.colors.includes(name)
-                        return (
-                          <button
+                {/* Colour */}
+                {availableColors.length > 0 && (
+                  <>
+                    <Divider />
+                    <Stack direction="column" gap="3">
+                      <p className={styles.filterSectionLabel}>Colour</p>
+                      <Stack direction="row" wrap gap="2">
+                        {availableColors.map(({ name, hex }) => (
+                          <Chip
                             key={name}
-                            className={`${styles.colorChip} ${isActive ? styles.colorChipActive : ''}`}
+                            selected={draft.colors.includes(name)}
                             onClick={() => setDraft((d) => ({ ...d, colors: toggle(d.colors, name) }))}
                             title={name}
-                            aria-label={name}
-                            aria-pressed={isActive}
+                            icon={
+                              <span
+                                className={styles.colorSwatch}
+                                style={{ background: hex, border: hex === '#ffffff' ? '1px solid var(--border)' : 'none' }}
+                              />
+                            }
                           >
-                            <span
-                              className={styles.colorSwatch}
-                              style={{ background: hex, border: hex === '#ffffff' ? '1px solid #e8e8e8' : 'none' }}
-                            />
-                            <span className={styles.colorLabel}>{name}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </section>
-                  <div className={styles.divider} />
-                </>
-              )}
+                            {name}
+                          </Chip>
+                        ))}
+                      </Stack>
+                    </Stack>
+                  </>
+                )}
 
-              {/* Size */}
-              {availableSizes.length > 0 && (
-                <>
-                  <section className={styles.filterSection}>
-                    <p className={styles.filterSectionLabel}>Size</p>
-                    <div className={styles.chips}>
-                      {availableSizes.map((size) => (
-                        <button
-                          key={size}
-                          className={`${styles.chip} ${draft.sizes.includes(size) ? styles.chipActive : ''}`}
-                          onClick={() => setDraft((d) => ({ ...d, sizes: toggle(d.sizes, size) }))}
-                          aria-pressed={draft.sizes.includes(size)}
-                        >{size}</button>
-                      ))}
-                    </div>
-                  </section>
-                  <div className={styles.divider} />
-                </>
-              )}
+                {/* Size */}
+                {availableSizes.length > 0 && (
+                  <>
+                    <Divider />
+                    <Stack direction="column" gap="3">
+                      <p className={styles.filterSectionLabel}>Size</p>
+                      <Chips
+                        mode="multiple"
+                        options={availableSizes}
+                        value={draft.sizes}
+                        onChange={(v) => setDraft((d) => ({ ...d, sizes: v }))}
+                      />
+                    </Stack>
+                  </>
+                )}
 
-              {/* Upcoming */}
-              {(['Model', 'Fit', 'Material', 'Accessory Style'] as const).map((label) => (
-                <section key={label} className={`${styles.filterSection} ${styles.filterSectionDisabled}`}>
-                  <p className={styles.filterSectionLabel}>{label}</p>
-                  <p className={styles.filterComingSoon}>Coming soon</p>
-                </section>
-              ))}
+                {/* Upcoming */}
+                {(['Model', 'Fit', 'Material', 'Accessory Style'] as const).map((label) => (
+                  <Stack key={label} direction="column" gap="3" className={styles.filterSectionDisabled}>
+                    <p className={styles.filterSectionLabel}>{label}</p>
+                    <p className={styles.filterComingSoon}>Coming soon</p>
+                  </Stack>
+                ))}
 
-              <div className={styles.filterActions}>
-                <button className={styles.clearBtn} onClick={clearFilters}>Clear</button>
-                <button className={styles.applyBtn} onClick={applyFilters}>Apply</button>
-              </div>
+                <Stack direction="row" gap="3" className={styles.filterActions}>
+                  <Button variant="secondary" onClick={clearFilters}>Clear</Button>
+                  <Button variant="primary" onClick={applyFilters}>Apply</Button>
+                </Stack>
+              </Stack>
             </div>
           )}
         </div>
-      </div>
+      </Stack>
 
-      {loading && <div className={styles.loadingArea}><Spinner /></div>}
+      {loading && (
+        <Grid minColWidth="240px" gap="6">
+          {Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+        </Grid>
+      )}
       {error && <p className={styles.error}>{error}</p>}
       {!loading && !error && (
         <>
           {data?.items.length === 0 && <p className={styles.empty}>No products found.</p>}
-          <div className={styles.grid}>
+          <Grid minColWidth="240px" gap="6">
             {data?.items.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
+          </Grid>
           {data && data.total > data.page_size && (
-            <div className={styles.pagination}>
-              {page > 1 && <button onClick={() => setParams({ ...Object.fromEntries(params), page: String(page - 1) })}>Prev</button>}
-              <span>Page {page}</span>
-              {data.total > page * data.page_size && <button onClick={() => setParams({ ...Object.fromEntries(params), page: String(page + 1) })}>Next</button>}
-            </div>
+            <Stack direction="row" justify="center" className={styles.pagination}>
+              <Pagination
+                page={page}
+                totalPages={Math.ceil(data.total / data.page_size)}
+                onChange={(p) => setParams({ ...Object.fromEntries(params), page: String(p) })}
+              />
+            </Stack>
           )}
         </>
       )}
-    </div>
+    </Box>
   )
 }

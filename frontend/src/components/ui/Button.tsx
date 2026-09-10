@@ -1,19 +1,13 @@
-import styles from './Button.module.css'
+import { forwardRef } from 'react'
+import { Button as VcsButton } from '@shehandon/vcs-ui'
+import type { ButtonProps as VcsButtonProps } from '@shehandon/vcs-ui'
 
-interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  readonly loading?: boolean
+interface Props extends Omit<VcsButtonProps, 'variant'> {
   readonly variant?: 'primary' | 'secondary' | 'danger'
 }
 
-export function Button({ loading = false, variant = 'primary', disabled, children, ...rest }: Props) {
-  return (
-    <button
-      {...rest}
-      disabled={disabled || loading}
-      className={`${styles.btn} ${styles[variant]}`}
-    >
-      {loading && <span className={styles.spinnerIcon} aria-hidden="true" />}
-      <span className={loading ? styles.srOnly : undefined}>{children}</span>
-    </button>
-  )
-}
+export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, Props>(
+  function Button({ variant = 'primary', ...rest }, ref) {
+    return <VcsButton ref={ref} variant={variant} {...rest} />
+  }
+)

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Trash2, Pencil, Plus, X } from 'lucide-react'
 import {
   getCollaborators,
@@ -10,10 +10,11 @@ import {
 } from '../../api/collaborators'
 import type { CollaboratorPayload } from '../../api/collaborators'
 import { Button } from '../../components/ui/Button'
+import { Input } from '../../components/ui/Input'
 import { Dialog } from '../../components/ui/Dialog'
 import { PageLoader } from '../../components/ui/PageLoader'
 import { useDragSort } from '../../hooks/useDragSort'
-import { useToast } from '../../contexts/ToastContext'
+import { FileUpload, Switch, useToast, Box, Stack, Chips } from '@shehandon/vcs-ui'
 import { useConfirm } from '../../contexts/ConfirmContext'
 import type { Collaborator, CollabType } from '../../types'
 import styles from './CollaboratorsAdminPage.module.css'
@@ -48,7 +49,6 @@ export function CollaboratorsAdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const confirm = useConfirm()
 
@@ -95,18 +95,17 @@ export function CollaboratorsAdminPage() {
     setForm(EMPTY_FORM)
   }
 
-  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
+  async function handleImageChange(files: File[]) {
+    const file = files[0]
     if (!file) return
     setUploading(true)
     try {
       const url = await uploadCollaboratorImage(file)
       setForm((f) => ({ ...f, image_url: url }))
     } catch {
-      toast('Failed to upload image. Please try again.', 'error')
+      toast({ title: 'Failed to upload image. Please try again.', variant: 'danger' })
     } finally {
       setUploading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
@@ -116,16 +115,16 @@ export function CollaboratorsAdminPage() {
     try {
       if (editingId) {
         const updated = await updateCollaborator(editingId, form)
-        toast('Collaborator updated.', 'success')
+        toast({ title: 'Collaborator updated.', variant: 'success' })
         sync(collaborators.map((c) => c.id === editingId ? updated : c))
       } else {
         const created = await createCollaborator({ ...form, display_order: collaborators.length * 10 })
-        toast('Collaborator added.', 'success')
+        toast({ title: 'Collaborator added.', variant: 'success' })
         sync([...collaborators, created])
       }
       closeDialog()
     } catch {
-      toast('Failed to save collaborator. Please try again.', 'error')
+      toast({ title: 'Failed to save collaborator. Please try again.', variant: 'danger' })
     } finally {
       setSubmitting(false)
     }
@@ -140,10 +139,10 @@ export function CollaboratorsAdminPage() {
     if (!ok) return
     try {
       await deleteCollaborator(id)
-      toast('Collaborator deleted.', 'success')
+      toast({ title: 'Collaborator deleted.', variant: 'success' })
       sync(collaborators.filter((c) => c.id !== id))
     } catch {
-      toast('Failed to delete collaborator. Please try again.', 'error')
+      toast({ title: 'Failed to delete collaborator. Please try again.', variant: 'danger' })
     }
   }
 
@@ -151,13 +150,13 @@ export function CollaboratorsAdminPage() {
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
-    <div className={styles.page}>
-      <div className={styles.pageHeader}>
-        <h1>Collaborators</h1>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <Stack direction="row" align="center" justify="between" wrap gap="4" className={styles.pageHeader}>
+        <h1 className={styles.title}>Collaborators</h1>
         <Button onClick={openAdd}>
           <Plus size={13} strokeWidth={1.5} aria-hidden="true" /> Add Collaborator
         </Button>
-      </div>
+      </Stack>
 
       {collaborators.length === 0 ? (
         <p className={styles.empty}>No collaborators yet.</p>
@@ -201,24 +200,26 @@ export function CollaboratorsAdminPage() {
                   </td>
                   <td>{c.is_featured && <span className={styles.badge}>Featured</span>}</td>
                   <td className={styles.actionsCell}>
-                    <button
-                      type="button"
-                      className={styles.iconBtn}
+                    <Button
+                      variant="secondary"
+                      shape="square"
+                      size="sm"
                       onClick={() => openEdit(c)}
                       title="Edit"
                       aria-label="Edit collaborator"
                     >
                       <Pencil size={14} strokeWidth={1.5} aria-hidden="true" />
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      shape="square"
+                      size="sm"
                       onClick={() => void handleDelete(c.id)}
                       title="Delete"
                       aria-label="Delete collaborator"
                     >
                       <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -232,28 +233,24 @@ export function CollaboratorsAdminPage() {
         onClose={closeDialog}
         title={editingId ? 'Edit Collaborator' : 'Add Collaborator'}
       >
-        <form onSubmit={(e) => void handleSubmit(e)} className={styles.form}>
+        <Stack as="form" direction="column" gap="8" onSubmit={(e) => void handleSubmit(e)}>
 
           {/* Image */}
-          <div className={styles.imageSection}>
+          <Stack direction="row" align="start" gap="6">
             <div
               className={styles.imagePreview}
               style={form.image_url ? { backgroundImage: `url(${form.image_url})` } : undefined}
             >
               {!form.image_url && <span className={styles.imagePlaceholder}>No image</span>}
             </div>
-            <div className={styles.imageActions}>
-              <input
-                ref={fileInputRef}
-                id="collab-image"
-                type="file"
+            <Stack direction="column" gap="3">
+              <FileUpload
+                variant="button"
                 accept="image/*"
-                style={{ display: 'none' }}
-                onChange={(e) => void handleImageChange(e)}
+                label={uploading ? 'Uploading…' : form.image_url ? 'Change image' : 'Upload image'}
+                disabled={uploading}
+                onChange={(files) => void handleImageChange(files)}
               />
-              <label htmlFor="collab-image" className={styles.imageUploadBtn}>
-                {uploading ? 'Uploading…' : form.image_url ? 'Change image' : 'Upload image'}
-              </label>
               {form.image_url && (
                 <button
                   type="button"
@@ -264,79 +261,60 @@ export function CollaboratorsAdminPage() {
                   <X size={12} strokeWidth={1.5} aria-hidden="true" /> Remove
                 </button>
               )}
-            </div>
-          </div>
+            </Stack>
+          </Stack>
 
           {/* Fields */}
-          <div className={styles.fields}>
-            <div className={styles.field}>
-              <label htmlFor="collab-name" className={styles.label}>Name <span className={styles.required}>*</span></label>
-              <input
-                id="collab-name"
-                type="text"
-                className={styles.input}
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                required
-                autoFocus
-              />
-            </div>
+          <Stack direction="column" gap="4">
+            <Input
+              label="Name"
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              required
+              autoFocus
+            />
 
-            <div className={styles.field}>
-              <label htmlFor="collab-url" className={styles.label}>Instagram URL <span className={styles.required}>*</span></label>
-              <input
-                id="collab-url"
-                type="url"
-                className={styles.input}
-                value={form.instagram_url}
-                onChange={(e) => setForm((f) => ({ ...f, instagram_url: e.target.value }))}
-                placeholder="https://instagram.com/username"
-                required
-              />
-            </div>
+            <Input
+              label="Instagram URL"
+              type="url"
+              value={form.instagram_url}
+              onChange={(e) => setForm((f) => ({ ...f, instagram_url: e.target.value }))}
+              placeholder="https://instagram.com/username"
+              required
+            />
 
-            <div className={styles.field}>
+            <Stack direction="column" gap="2">
               <span className={styles.label}>Type</span>
-              <div className={styles.typeToggle}>
-                {(['person', 'logo'] as CollabType[]).map((t) => (
-                  <label
-                    key={t}
-                    className={`${styles.typeOption} ${form.collab_type === t ? styles.typeOptionActive : ''}`}
-                  >
-                    <input
-                      type="radio"
-                      name="collab_type"
-                      value={t}
-                      checked={form.collab_type === t}
-                      onChange={() => setForm((f) => ({ ...f, collab_type: t }))}
-                      style={{ display: 'none' }}
-                    />
-                    {t === 'person' ? 'Person' : 'Logo'}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <label className={styles.checkRow}>
-              <input
-                type="checkbox"
-                checked={form.is_featured}
-                onChange={(e) => setForm((f) => ({ ...f, is_featured: e.target.checked }))}
+              <Chips
+                mode="single"
+                options={[
+                  { value: 'person', label: 'Person' },
+                  { value: 'logo', label: 'Logo' },
+                ]}
+                value={[form.collab_type]}
+                onChange={(v) => {
+                  if (v[0]) setForm((f) => ({ ...f, collab_type: v[0] as CollabType }))
+                }}
               />
-              <span>Featured — show as hero card</span>
-            </label>
-          </div>
+            </Stack>
 
-          <div className={styles.formFooter}>
+            <Switch
+              checked={form.is_featured}
+              onChange={(e) => setForm((f) => ({ ...f, is_featured: e.target.checked }))}
+              label="Featured — show as hero card"
+            />
+          </Stack>
+
+          <Stack direction="row" gap="3">
             <Button type="submit" loading={submitting}>
               {editingId ? 'Save Changes' : 'Add Collaborator'}
             </Button>
             <Button type="button" variant="secondary" onClick={closeDialog}>
               Cancel
             </Button>
-          </div>
-        </form>
+          </Stack>
+        </Stack>
       </Dialog>
-    </div>
+    </Box>
   )
 }

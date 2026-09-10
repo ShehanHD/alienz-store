@@ -1,15 +1,19 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAdminEnquiries, updateEnquiryStatus } from '../../api/enquiries'
-import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { ChevronUp, ChevronDown, ChevronsUpDown, ExternalLink } from 'lucide-react'
+import { DataGrid, Select, Textarea, Pagination, Box, Stack, Modal } from '@shehandon/vcs-ui'
+import type { ColumnDef } from '@shehandon/vcs-ui'
 import { PageLoader } from '../../components/ui/PageLoader'
+import { Input } from '../../components/ui/Input'
+import { Button } from '../../components/ui/Button'
 import type { Enquiry, EnquiryStatus, PaginatedResponse } from '../../types'
 import styles from './EnquiriesPage.module.css'
 
 type OrderBy = 'created_at' | 'name' | 'status' | 'email'
 type OrderDir = 'asc' | 'desc'
-type GroupBy = '' | 'status' | 'date'
 
-const STATUS_ORDER: Record<EnquiryStatus, number> = { new: 0, read: 1, accepted: 2, rejected: 3 }
+// DataGrid rows must satisfy its Row type (a string-keyed record); Enquiry does.
+type EnquiryRow = Enquiry & Record<string, unknown>
 
 const STATUS_LABEL: Record<EnquiryStatus, string> = {
   new: 'New',
@@ -18,39 +22,33 @@ const STATUS_LABEL: Record<EnquiryStatus, string> = {
   rejected: 'Rejected',
 }
 
-interface Group {
-  key: string
-  label: string
-  items: Enquiry[]
+// Shorten a product name to at most two words; a third word collapses to its
+// first letter + "…" (e.g. "Neon Bomber Jacket Deluxe" -> "Neon Bomber J…").
+function shortenName(name: string): string {
+  const words = name.trim().split(/\s+/)
+  if (words.length <= 2) return words.join(' ')
+  return `${words[0]} ${words[1]} ${words[2].charAt(0)}…`
 }
 
-function groupByStatus(items: Enquiry[]): Group[] {
-  const map = new Map<string, Enquiry[]>()
-  for (const item of items) {
-    const key = item.status
-    if (!map.has(key)) map.set(key, [])
-    map.get(key)!.push(item)
-  }
-  return [...map.entries()]
-    .sort(([a], [b]) => (STATUS_ORDER[a as EnquiryStatus] ?? 99) - (STATUS_ORDER[b as EnquiryStatus] ?? 99))
-    .map(([key, items]) => ({ key, label: STATUS_LABEL[key as EnquiryStatus] ?? key, items }))
+// Clean, unambiguous date: "2026-07-06" (local calendar day).
+function formatDate(value: string): string {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return '—'
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
-function groupByDate(items: Enquiry[]): Group[] {
-  const map = new Map<string, Enquiry[]>()
-  for (const item of items) {
-    const key = new Date(item.created_at).toLocaleDateString()
-    if (!map.has(key)) map.set(key, [])
-    map.get(key)!.push(item)
-  }
-  return [...map.entries()].map(([key, items]) => ({ key, label: key, items }))
-}
-
-function SortIcon({ col, orderBy, orderDir }: { col: OrderBy; orderBy: OrderBy; orderDir: OrderDir }) {
-  if (col !== orderBy) return <ChevronsUpDown size={12} strokeWidth={1.5} className={styles.sortIcon} />
-  return orderDir === 'asc'
-    ? <ChevronUp size={12} strokeWidth={1.5} className={styles.sortIconActive} />
-    : <ChevronDown size={12} strokeWidth={1.5} className={styles.sortIconActive} />
+function SortHeader({ label, col, orderBy, orderDir, onSort }: {
+  label: string; col: OrderBy; orderBy: OrderBy; orderDir: OrderDir; onSort: (col: OrderBy) => void
+}) {
+  const Icon = col !== orderBy ? ChevronsUpDown : orderDir === 'asc' ? ChevronUp : ChevronDown
+  return (
+    <button type="button" className={styles.sortBtn} onClick={() => onSort(col)}>
+      {label} <Icon size={12} strokeWidth={1.5} className={col === orderBy ? styles.sortIconActive : styles.sortIcon} />
+    </button>
+  )
 }
 
 export function EnquiriesPage() {
@@ -63,7 +61,6 @@ export function EnquiriesPage() {
   const [search, setSearch] = useState('')
   const [orderBy, setOrderBy] = useState<OrderBy>('created_at')
   const [orderDir, setOrderDir] = useState<OrderDir>('desc')
-  const [groupBy, setGroupBy] = useState<GroupBy>('')
 
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -79,12 +76,12 @@ export function EnquiriesPage() {
     }
   }, [search])
 
-  const load = useCallback((p: number, status: string, q: string, ob: OrderBy, od: OrderDir, gb: GroupBy) => {
+  const load = useCallback((p: number, status: string, q: string, ob: OrderBy, od: OrderDir) => {
     setLoading(true)
     setLoadError(null)
     getAdminEnquiries({
       page: p,
-      page_size: gb !== '' ? 500 : 20,
+      page_size: 20,
       ...(status ? { status } : {}),
       ...(q ? { search: q } : {}),
       order_by: ob,
@@ -96,8 +93,8 @@ export function EnquiriesPage() {
   }, [])
 
   useEffect(() => {
-    load(page, statusFilter, debouncedSearch, orderBy, orderDir, groupBy)
-  }, [page, statusFilter, debouncedSearch, orderBy, orderDir, groupBy, load])
+    load(page, statusFilter, debouncedSearch, orderBy, orderDir)
+  }, [page, statusFilter, debouncedSearch, orderBy, orderDir, load])
 
   function handleSort(col: OrderBy) {
     if (col === orderBy) {
@@ -115,146 +112,185 @@ export function EnquiriesPage() {
       const updated = await updateEnquiryStatus(id, status, rejectionReason)
       setData((prev) => {
         if (!prev) return prev
-        return { ...prev, items: prev.items.map((e) => (e.id === id ? updated : e)) }
+        return {
+          ...prev,
+          // The update endpoint doesn't return product fields (they default to
+          // null), but the product never changes — preserve them from the
+          // existing row so the item doesn't disappear after an action.
+          items: prev.items.map((e) =>
+            e.id === id
+              ? {
+                  ...updated,
+                  product_name: e.product_name,
+                  product_slug: e.product_slug,
+                  product_thumbnail_url: e.product_thumbnail_url,
+                }
+              : e,
+          ),
+        }
       })
     } catch {
       setUpdateError('Failed to update enquiry. Please try again.')
     }
   }
 
-  if (loading) return <PageLoader />
-  if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
+  // Only take over the whole page on the FIRST load. On refetches (search,
+  // filter, sort, paging) keep the controls mounted — otherwise the search
+  // input unmounts mid-type and loses focus on every keystroke.
+  if (loading && !data) return <PageLoader />
+  if (loadError && !data) return <p role="alert" className={styles.error}>{loadError}</p>
 
   const items = data?.items ?? []
+  const rows = items as EnquiryRow[]
 
-  const groups: Group[] | null =
-    groupBy === 'status' ? groupByStatus(items)
-    : groupBy === 'date' ? groupByDate(items)
-    : null
-
-  const colCount = 6
+  const columns: ColumnDef<EnquiryRow>[] = [
+    {
+      field: 'created_at',
+      width: 128,
+      renderHeader: () => <SortHeader label="Date" col="created_at" orderBy={orderBy} orderDir={orderDir} onSort={handleSort} />,
+      renderCell: (value) => (
+        <div className={styles.cell}>
+          <span className={styles.date}>{formatDate(value as string)}</span>
+        </div>
+      ),
+    },
+    {
+      field: 'name',
+      minWidth: 190,
+      renderHeader: () => <SortHeader label="Customer" col="name" orderBy={orderBy} orderDir={orderDir} onSort={handleSort} />,
+      renderCell: (_value, row) => (
+        <div className={`${styles.cell} ${styles.customerCell}`}>
+          <span className={styles.name}>{row.name}</span>
+          <a href={`mailto:${row.email}`} className={styles.email}>{row.email}</a>
+          {row.phone && <span className={styles.phone}>{row.phone}</span>}
+        </div>
+      ),
+    },
+    {
+      field: 'productDetails',
+      header: 'Item',
+      minWidth: 300,
+      renderCell: (_value, row) => <ProductDetails enq={row} />,
+    },
+    {
+      field: 'message',
+      header: 'Message',
+      minWidth: 260,
+      renderCell: (value) => (
+        <div className={styles.cell}>
+          {value ? <span className={styles.message}>{value as string}</span> : <span className={styles.empty}>—</span>}
+        </div>
+      ),
+    },
+    {
+      field: 'status',
+      width: 148,
+      renderHeader: () => <SortHeader label="Status" col="status" orderBy={orderBy} orderDir={orderDir} onSort={handleSort} />,
+      renderCell: (value, row) => (
+        <div className={`${styles.cell} ${styles.statusCell}`}>
+          <span className={`${styles.statusBadge} ${styles[`status_${value as EnquiryStatus}`]}`}>
+            {STATUS_LABEL[value as EnquiryStatus]}
+          </span>
+          {row.status === 'rejected' && row.rejection_reason && (
+            <p className={styles.rejectionReason}>{row.rejection_reason}</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: 'actions',
+      header: 'Actions',
+      width: 216,
+      renderCell: (_value, row) => (
+        <div className={`${styles.cell} ${styles.actionsCell}`}>
+          <EnquiryActions enq={row} onAction={handleAction} />
+        </div>
+      ),
+    },
+  ]
 
   return (
-    <div className={styles.page}>
-      <h1>Enquiries</h1>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <h1 className={styles.title}>Enquiries</h1>
 
+      {loadError && <p role="alert" className={styles.error}>{loadError}</p>}
       {updateError && <p role="alert" className={styles.error}>{updateError}</p>}
 
-      <div className={styles.controls}>
-        <input
+      <Stack direction={{ base: 'column', sm: 'row' }} align={{ base: 'stretch', sm: 'end' }} gap="3" className={styles.controls}>
+        <Input
           type="search"
-          className={styles.search}
+          label="Search"
+          aria-label="Search enquiries"
           placeholder="Search name, email, phone, message…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          aria-label="Search enquiries"
         />
-        <div className={styles.selects}>
-          <label htmlFor="status-filter" className={styles.srOnly}>Filter by status</label>
-          <select
-            id="status-filter"
-            value={statusFilter}
-            onChange={(e) => { setPage(1); setStatusFilter(e.target.value) }}
-          >
-            <option value="">All statuses</option>
-            <option value="new">New</option>
-            <option value="read">Read</option>
-            <option value="accepted">Accepted</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <label htmlFor="group-by" className={styles.srOnly}>Group by</label>
-          <select
-            id="group-by"
-            value={groupBy}
-            onChange={(e) => { setGroupBy(e.target.value as GroupBy); setPage(1) }}
-          >
-            <option value="">No grouping</option>
-            <option value="status">Group by status</option>
-            <option value="date">Group by date</option>
-          </select>
-        </div>
+        <Select
+          aria-label="Filter by status"
+          value={statusFilter}
+          onChange={(v) => { setPage(1); setStatusFilter(v as string) }}
+          options={[
+            { value: '', label: 'All statuses' },
+            { value: 'new', label: 'New' },
+            { value: 'read', label: 'Read' },
+            { value: 'accepted', label: 'Accepted' },
+            { value: 'rejected', label: 'Rejected' },
+          ]}
+        />
+      </Stack>
+
+      {data && (
+        <p className={styles.resultCount}>
+          {data.total} {data.total === 1 ? 'enquiry' : 'enquiries'}
+          {(statusFilter || debouncedSearch) && ' match your filters'}
+        </p>
+      )}
+
+      {/* The DataGrid renders its own top bar with a client-side search box +
+          column menu. On a server-paginated table that search only filters the
+          loaded page, duplicating the (server-side) Search above — so we hide
+          it and drive all search/filter from our own controls. The
+          [class*="topBar"] selector survives vcs-ui hash changes. */}
+      <div className={styles.gridWrap}>
+        <DataGrid<EnquiryRow>
+          rows={rows}
+          columns={columns}
+          options={{
+            pagination: false,
+            emptyMessage: 'No enquiries found.',
+            // vcs-ui DataGrid uses ONE fixed height for every row — including
+            // group-header rows — so this also sets how thick grouped headers
+            // are. Sized to fit the tallest inline cell (the 3-line customer
+            // block / product details); the reject form lives in a modal now,
+            // so it no longer forces the height up.
+            rowHeight: 88,
+          }}
+        />
       </div>
 
-      {items.length === 0 ? (
-        <p>No enquiries found.</p>
-      ) : (
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>
-                  <button type="button" className={styles.sortBtn} onClick={() => handleSort('created_at')}>
-                    Date <SortIcon col="created_at" orderBy={orderBy} orderDir={orderDir} />
-                  </button>
-                </th>
-                <th>
-                  <button type="button" className={styles.sortBtn} onClick={() => handleSort('name')}>
-                    Customer <SortIcon col="name" orderBy={orderBy} orderDir={orderDir} />
-                  </button>
-                </th>
-                <th>Product details</th>
-                <th>Message</th>
-                <th>
-                  <button type="button" className={styles.sortBtn} onClick={() => handleSort('status')}>
-                    Status <SortIcon col="status" orderBy={orderBy} orderDir={orderDir} />
-                  </button>
-                </th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groups
-                ? groups.map((group) => (
-                    <Fragment key={group.key}>
-                      <tr className={styles.groupRow}>
-                        <td colSpan={colCount}>
-                          <span className={styles.groupLabel}>{group.label}</span>
-                          <span className={styles.groupCount}>{group.items.length}</span>
-                        </td>
-                      </tr>
-                      {group.items.map((enq) => (
-                        <EnquiryRow key={enq.id} enq={enq} onAction={handleAction} />
-                      ))}
-                    </Fragment>
-                  ))
-                : items.map((enq) => (
-                    <EnquiryRow key={enq.id} enq={enq} onAction={handleAction} />
-                  ))}
-            </tbody>
-          </table>
-        </div>
+      {data && data.total > data.page_size && (
+        <Stack direction="row" justify="center" className={styles.pagination}>
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(data.total / data.page_size)}
+            onChange={setPage}
+          />
+        </Stack>
       )}
-
-      {!groups && data && data.total > data.page_size && (
-        <div className={styles.pagination}>
-          {page > 1 && (
-            <button type="button" className={styles.pageBtn} onClick={() => setPage((p) => p - 1)} aria-label="Previous">
-              <ChevronLeft size={14} strokeWidth={1.5} />
-            </button>
-          )}
-          <span>Page {page}</span>
-          {data.total > page * data.page_size && (
-            <button type="button" className={styles.pageBtn} onClick={() => setPage((p) => p + 1)} aria-label="Next">
-              <ChevronRight size={14} strokeWidth={1.5} />
-            </button>
-          )}
-        </div>
-      )}
-    </div>
+    </Box>
   )
 }
 
-function EnquiryRow({
+function EnquiryActions({
   enq,
   onAction,
 }: {
   enq: Enquiry
   onAction: (id: string, status: EnquiryStatus, rejectionReason?: string) => Promise<void>
 }) {
-  const [rejecting, setRejecting] = useState(false)
+  const [rejectOpen, setRejectOpen] = useState(false)
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const isTerminal = enq.status === 'accepted' || enq.status === 'rejected'
 
@@ -262,132 +298,117 @@ function EnquiryRow({
     setBusy(true)
     await onAction(enq.id, status, rejectionReason)
     setBusy(false)
-    setRejecting(false)
+    setRejectOpen(false)
     setReason('')
   }
 
-  function openReject() {
-    setRejecting(true)
-    setTimeout(() => textareaRef.current?.focus(), 0)
-  }
-
-  function cancelReject() {
-    setRejecting(false)
+  function closeReject() {
+    setRejectOpen(false)
     setReason('')
   }
+
+  if (isTerminal) return null
 
   return (
-    <tr className={rejecting ? styles.rowRejecting : undefined}>
-      <td className={styles.date}>{new Date(enq.created_at).toLocaleDateString()}</td>
-      <td>
-        <span className={styles.name}>{enq.name}</span>
-        <a href={`mailto:${enq.email}`} className={styles.email}>{enq.email}</a>
-        {enq.phone && <span className={styles.phone}>{enq.phone}</span>}
-      </td>
-      <td>
-        <ProductDetails enq={enq} />
-      </td>
-      <td className={styles.message}>{enq.message || <span className={styles.empty}>—</span>}</td>
-      <td>
-        <span className={`${styles.statusBadge} ${styles[`status_${enq.status}`]}`}>
-          {STATUS_LABEL[enq.status]}
-        </span>
-        {enq.status === 'rejected' && enq.rejection_reason && (
-          <p className={styles.rejectionReason}>{enq.rejection_reason}</p>
+    <>
+      <Stack direction="row" wrap gap="2" className={styles.actions}>
+        {enq.status === 'new' && (
+          <Button variant="secondary" size="sm" disabled={busy} onClick={() => void act('read')}>
+            Mark read
+          </Button>
         )}
-      </td>
-      <td className={styles.actionCell}>
-        {!isTerminal && !rejecting && (
-          <div className={styles.actions}>
-            {enq.status === 'new' && (
-              <button
-                type="button"
-                className={styles.actionBtn}
-                disabled={busy}
-                onClick={() => void act('read')}
-              >
-                Mark read
-              </button>
-            )}
-            <button
-              type="button"
-              className={`${styles.actionBtn} ${styles.actionAccept}`}
-              disabled={busy}
-              onClick={() => void act('accepted')}
-            >
-              Accept
-            </button>
-            <button
-              type="button"
-              className={`${styles.actionBtn} ${styles.actionReject}`}
-              disabled={busy}
-              onClick={openReject}
+        <Button variant="primary" size="sm" disabled={busy} onClick={() => void act('accepted')}>
+          Accept
+        </Button>
+        <Button variant="danger" size="sm" disabled={busy} onClick={() => setRejectOpen(true)}>
+          Reject
+        </Button>
+      </Stack>
+
+      <Modal
+        open={rejectOpen}
+        onClose={closeReject}
+        title="Reject enquiry"
+        description="Add a reason — it will be shown against the enquiry."
+        size="sm"
+        footer={
+          <Stack direction="row" gap="2" justify="end">
+            <Button variant="secondary" size="sm" disabled={busy} onClick={closeReject}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              loading={busy}
+              disabled={reason.trim() === ''}
+              onClick={() => void act('rejected', reason.trim())}
             >
               Reject
-            </button>
-          </div>
-        )}
-
-        {rejecting && (
-          <div className={styles.rejectForm}>
-            <textarea
-              ref={textareaRef}
-              className={styles.rejectTextarea}
-              placeholder="Reason for rejection…"
-              value={reason}
-              rows={2}
-              onChange={(e) => setReason(e.target.value)}
-              disabled={busy}
-            />
-            <div className={styles.rejectFormActions}>
-              <button
-                type="button"
-                className={`${styles.actionBtn} ${styles.actionReject}`}
-                disabled={busy || reason.trim() === ''}
-                onClick={() => void act('rejected', reason.trim())}
-              >
-                Confirm reject
-              </button>
-              <button
-                type="button"
-                className={styles.actionBtn}
-                disabled={busy}
-                onClick={cancelReject}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </td>
-    </tr>
+            </Button>
+          </Stack>
+        }
+      >
+        <Textarea
+          aria-label="Reason for rejection"
+          placeholder="Reason for rejection…"
+          value={reason}
+          rows={3}
+          onChange={(e) => setReason(e.target.value)}
+          disabled={busy}
+        />
+      </Modal>
+    </>
   )
 }
 
 function ProductDetails({ enq }: { enq: Enquiry }) {
   const hasSize = Boolean(enq.size)
   const hasColor = Boolean(enq.color)
+  const hasProduct = Boolean(enq.product_name)
 
   if (!enq.product_id && !hasSize && !hasColor) {
-    return <span className={styles.empty}>—</span>
+    return (
+      <div className={styles.cell}>
+        <span className={styles.empty}>—</span>
+      </div>
+    )
   }
 
+  const meta = [
+    `Qty ${enq.quantity}`,
+    hasSize ? `Size ${enq.size}` : null,
+    hasColor ? enq.color : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+  const shortName = enq.product_name ? shortenName(enq.product_name) : ''
+  const name = hasProduct
+    ? enq.product_slug
+      ? (
+        <a
+          href={`/shop/${enq.product_slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.productLink}
+          title={enq.product_name ?? undefined}
+        >
+          <span className={styles.productName}>{shortName}</span>
+          <ExternalLink size={12} strokeWidth={1.5} className={styles.productLinkIcon} />
+        </a>
+      )
+      : <span className={styles.productName} title={enq.product_name ?? undefined}>{shortName}</span>
+    : null
+
   return (
-    <dl className={styles.productDetails}>
-      {hasSize && (
-        <>
-          <dt>Size</dt>
-          <dd>{enq.size}</dd>
-        </>
+    <div className={styles.itemCell}>
+      {enq.product_thumbnail_url && (
+        <img src={enq.product_thumbnail_url} alt="" className={styles.itemThumb} />
       )}
-      {hasColor && (
-        <>
-          <dt>Color</dt>
-          <dd>{enq.color}</dd>
-        </>
-      )}
-      <dt>Qty</dt>
-      <dd>{enq.quantity}</dd>
-    </dl>
+      <div className={styles.itemInfo}>
+        {name}
+        <span className={styles.productMeta}>{meta}</span>
+      </div>
+    </div>
   )
 }

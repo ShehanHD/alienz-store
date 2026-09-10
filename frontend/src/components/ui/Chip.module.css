@@ -1,0 +1,22 @@
+/* Unstyled button reset so vcs-ui Badge stays the visual element while the
+   wrapping <button> provides real keyboard/press semantics. */
+.chipBtn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.chipBtn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+/* Selected chips use the subtle (accent-soft) fill; add an accent border on
+   top so the selection reads clearly. vcs-ui's subtle variant leaves the
+   border transparent. */
+.selected {
+  border-color: var(--accent);
+}

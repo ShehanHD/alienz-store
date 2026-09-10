@@ -1,112 +1,48 @@
-.page {
-  padding: var(--space-12) var(--space-8);
-}
+/* Residual admin-enquiries styling: title/status/typography, the custom sort
+   header buttons, DataGrid cell-content chrome, and — importantly — the
+   white-space:normal overrides that let our multi-line cells wrap inside
+   DataGrid's otherwise nowrap cells. Page padding, controls row, select row,
+   action rows and pagination live on vcs-ui Box/Stack (EnquiriesPage.tsx). */
 
-@media (max-width: 768px) {
-  .page {
-    padding: var(--space-6) var(--space-4);
-  }
-}
-
-.page h1 {
-  font-family: var(--font-heading);
+.title {
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 400;
   letter-spacing: 0.02em;
-  margin-bottom: var(--space-8);
-  padding-bottom: var(--space-6);
+  margin-bottom: var(--sp-8);
+  padding-bottom: var(--sp-6);
   border-bottom: 1px solid var(--border);
 }
 
-/* Controls row: search + selects */
 .controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
-  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
 }
 
-.search {
-  flex: 1 1 220px;
-  min-width: 180px;
-  padding: 0.625rem var(--space-3);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  font-weight: 300;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  transition: border-color var(--transition);
+.resultCount {
+  margin: 0 0 var(--sp-4);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
 }
 
-.search:focus {
-  outline: none;
-  border-color: var(--text-primary);
+/* Hide the DataGrid's built-in top bar (client-side search + column menu); we
+   drive search/filter/grouping from our own server-side controls. Substring
+   selector so it survives vcs-ui CSS-module hash changes. */
+.gridWrap :global([class*='topBar']) {
+  display: none;
 }
 
-.selects {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+.controls > *:first-child {
+  flex: 1;
 }
 
-.selects select {
-  padding: 0.625rem var(--space-3);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  font-weight: 300;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: border-color var(--transition);
-}
-
-.selects select:focus {
-  outline: none;
-  border-color: var(--text-primary);
-}
-
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Table */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-}
-
-.table th {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  font-size: 0.5625rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-}
-
-.table td {
-  text-align: left;
-  padding: var(--space-4) var(--space-4);
-  border-bottom: 1px solid var(--border);
-  font-weight: 300;
-  vertical-align: top;
+.error {
+  color: var(--danger);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-4);
+  border: 1px solid var(--danger);
 }
 
 /* Sortable header buttons */
@@ -122,126 +58,126 @@
   font-weight: 500;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  transition: color var(--transition);
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  transition: color var(--dur) var(--ease);
 }
 
-.sortBtn:hover {
-  color: var(--text-primary);
-}
+.sortBtn:hover { color: var(--text); }
+.sortIcon { opacity: 0.4; flex-shrink: 0; }
+.sortIconActive { opacity: 1; flex-shrink: 0; color: var(--text); }
 
-.sortIcon {
-  opacity: 0.4;
-  flex-shrink: 0;
-}
-
-.sortIconActive {
-  opacity: 1;
-  flex-shrink: 0;
-  color: var(--text-primary);
-}
-
-/* Group header rows */
-.groupRow td {
-  padding: var(--space-2) var(--space-4);
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
-  border-top: 1px solid var(--border);
-}
-
-.groupRow:first-child td {
-  border-top: none;
-}
-
-.groupLabel {
-  font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.groupCount {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: var(--space-2);
-  padding: 0 6px;
-  height: 16px;
-  font-size: 0.625rem;
-  font-weight: 400;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-}
-
-/* Cell variants */
-.name {
-  display: block;
-  font-weight: 400;
-}
-
-.email {
-  display: block;
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.75rem;
-  margin-top: 2px;
-}
-
-.email:hover {
-  color: var(--text-primary);
-}
-
-.phone {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  margin-top: 2px;
+/* Shared cell wrapper. DataGrid centres cell content in a fixed 88px row, so
+   1–3 line cells float at different heights and rows read raggedly. This fills
+   the row height and top-aligns every column to one clean baseline. It also
+   opts back into wrapping (DataGrid cells are nowrap). */
+.cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 3px;
+  padding: 14px 0;
+  white-space: normal;
 }
 
 .date {
+  font-size: 0.8125rem;
+  color: var(--text);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.empty {
-  color: var(--text-secondary);
-}
+.customerCell { white-space: normal; }
 
-.message {
-  max-width: 280px;
-  word-break: break-word;
-}
+.name { display: block; font-weight: 500; }
 
-.productDetails {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 2px var(--space-3);
-  margin: 0;
-  padding: 0;
+.email {
+  display: block;
+  color: var(--text-muted);
+  text-decoration: none;
   font-size: 0.75rem;
 }
 
-.productDetails dt {
-  color: var(--text-secondary);
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding-top: 1px;
+.email:hover { color: var(--text); }
+
+.phone {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.75rem;
 }
 
-.productDetails dd {
-  margin: 0;
+.empty { color: var(--text-muted); }
+
+.message {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  max-width: 280px;
+  white-space: normal;
+  word-break: break-word;
 }
 
-/* Action cell */
-.actionCell {
-  min-width: 160px;
-  vertical-align: top;
+/* Item cell: product image fills the row height on the left; the name link
+   sits on the right with quantity/size/color beneath it. */
+.itemCell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: var(--sp-3);
+  padding: 10px 0;
+  white-space: normal;
 }
 
-/* Status badge */
+.itemThumb {
+  height: 100%;
+  width: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.productLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  text-decoration: none;
+  color: inherit;
+}
+
+.productName {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.productLinkIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.productLink:hover .productName { text-decoration: underline; }
+.productLink:hover .productLinkIcon { color: var(--text); }
+
+.productMeta {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.statusCell { align-items: flex-start; white-space: normal; }
+
 .statusBadge {
   display: inline-block;
   padding: 2px 8px;
@@ -250,188 +186,36 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border-radius: 2px;
-  margin-bottom: var(--space-2);
 }
 
-.status_new {
-  background: #fef3c7;
-  color: #92400e;
-}
+.status_new      { background: var(--warning-soft); color: var(--warning); }
+.status_read     { background: var(--bg-subtle);    color: var(--text-muted); }
+.status_accepted { background: var(--success-soft); color: var(--success); }
+.status_rejected { background: var(--danger-soft);  color: var(--danger); }
 
-.status_read {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-}
-
-.status_accepted {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.status_rejected {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-/* Action buttons row */
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-.actionBtn {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.05em;
-  border: 1px solid var(--border-dark);
-  background: none;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: border-color var(--transition), background var(--transition), color var(--transition);
-  white-space: nowrap;
-}
-
-.actionBtn:hover:not(:disabled) {
-  border-color: var(--text-primary);
-  background: var(--text-primary);
-  color: var(--bg-primary);
-}
-
-.actionBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.actionAccept {
-  border-color: #059669;
-  color: #065f46;
-}
-
-.actionAccept:hover:not(:disabled) {
-  background: #059669;
-  border-color: #059669;
-  color: #ffffff;
-}
-
-.actionReject {
-  border-color: #dc2626;
-  color: #991b1b;
-}
-
-.actionReject:hover:not(:disabled) {
-  background: #dc2626;
-  border-color: #dc2626;
-  color: #ffffff;
-}
-
-/* Rejection reason display */
 .rejectionReason {
-  margin: var(--space-1) 0 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-style: italic;
-  max-width: 220px;
+  max-width: 100%;
+  white-space: normal;
   word-break: break-word;
 }
 
-/* Inline reject form */
-.rowRejecting {
-  background: #fff8f8;
-}
-
-.rejectForm {
-  margin-top: var(--space-2);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.rejectTextarea {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  font-weight: 300;
-  border: 1px solid #dc2626;
-  border-radius: var(--radius);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  resize: vertical;
-  transition: border-color var(--transition);
-}
-
-.rejectTextarea:focus {
-  outline: none;
-  border-color: #991b1b;
-}
-
-.rejectFormActions {
-  display: flex;
-  gap: var(--space-2);
-}
-
-/* Pagination */
-.pageBtn {
-  display: inline-flex;
-  align-items: center;
+/* Actions sit at the row's trailing edge, vertically centred, so the "do"
+   column reads apart from the data columns. */
+.actionsCell {
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border-dark);
-  background: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: border-color var(--transition), color var(--transition);
+  align-items: flex-end;
 }
 
-.pageBtn:hover {
-  border-color: var(--text-primary);
-  color: var(--text-primary);
-}
+.actions { white-space: normal; justify-content: flex-end; }
 
 .pagination {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-8);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-/* Table scroll wrapper */
-.tableWrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-@media (max-width: 768px) {
-  .pageBtn {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .selects {
-    flex-wrap: wrap;
-  }
-}
-
-.error {
-  color: var(--error);
-  font-size: 0.6875rem;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-6);
-  padding: var(--space-4);
-  border: 1px solid var(--error);
+  margin-top: var(--sp-8);
 }

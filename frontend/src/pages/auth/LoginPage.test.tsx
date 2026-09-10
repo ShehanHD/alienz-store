@@ -21,8 +21,8 @@ it('calls login with email and password', async () => {
     </MemoryRouter>
   )
   await userEvent.type(screen.getByLabelText(/email/i), 'a@b.com')
-  await userEvent.type(screen.getByLabelText(/password/i), 'secret')
-  await userEvent.click(screen.getByRole('button', { name: /login/i }))
+  await userEvent.type(screen.getByLabelText(/password/i, { selector: 'input' }), 'secret')
+  await userEvent.click(screen.getByRole('button', { name: /sign in/i }))
   expect(mockLogin).toHaveBeenCalledWith('a@b.com', 'secret')
 })
 
@@ -34,8 +34,8 @@ it('shows error message when login fails', async () => {
     </MemoryRouter>
   )
   fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'a@b.com' } })
-  fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'wrong' } })
-  fireEvent.click(screen.getByRole('button', { name: /login/i }))
+  fireEvent.change(screen.getByLabelText(/password/i, { selector: 'input' }), { target: { value: 'wrong' } })
+  fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
   await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
 })
 

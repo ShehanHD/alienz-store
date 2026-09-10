@@ -1,42 +1,37 @@
-.gallery {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+/* Residual gallery styling: image framing and the thumbnail button chrome
+   (fixed size, active-state ring). Column/row layout lives on vcs-ui Stack;
+   the main-image ratio on AspectRatio (ImageGallery.tsx). */
+
+.mainWrap {
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .main {
-  width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-  display: block;
-  border-radius: 12px;
-}
-
-.thumbs {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.thumb {
-  width: 64px;
-  height: 64px;
-  padding: 0;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  background: none;
-  overflow: hidden;
-  border-radius: 8px;
-  transition: border-color var(--transition);
-}
-
-.thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
+.thumb {
+  width: 64px;
+  height: 80px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .thumb.active {
-  border-color: var(--text-primary);
+  border-color: var(--accent);
 }

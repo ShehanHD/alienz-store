@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Container, Grid, Stack } from '@shehandon/vcs-ui'
 import { getWishlist, removeFromWishlist } from '../../api/wishlist'
 import { ProductCard } from '../../components/ui/ProductCard'
+import { PageLoader } from '../../components/ui/PageLoader'
+import { Button } from '../../components/ui/Button'
 import { useConfirm } from '../../contexts/ConfirmContext'
 import type { WishlistItem } from '../../types'
 import styles from './WishlistPage.module.css'
@@ -30,33 +33,33 @@ export function WishlistPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <Container size="lg" padding="6">
       <h1 className={styles.title}>Wishlist</h1>
       {error && (
         <p className={styles.error} role="alert">
           {error}
         </p>
       )}
-      {loading && <p>Loading…</p>}
+      {loading && <PageLoader />}
       {!loading && !error && items.length === 0 && (
         <p className={styles.empty}>Your wishlist is empty.</p>
       )}
       {!loading && items.length > 0 && (
-        <ul className={styles.list}>
+        <Grid minColWidth="240px" gap="6">
           {items.map((item) => (
-            <li key={item.id} className={styles.item}>
+            <Stack key={item.id} direction="column" gap="3">
               {item.product && <ProductCard product={item.product} />}
-              <button
-                className={styles.removeBtn}
+              <Button
+                variant="secondary"
                 onClick={() => void handleRemove(item.product_id)}
                 aria-label={`Remove ${item.product?.name ?? item.product_id} from wishlist`}
               >
                 Remove
-              </button>
-            </li>
+              </Button>
+            </Stack>
           ))}
-        </ul>
+        </Grid>
       )}
-    </div>
+    </Container>
   )
 }

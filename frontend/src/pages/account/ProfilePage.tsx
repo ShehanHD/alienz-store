@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
+import { Container, Box, Stack, Grid } from '@shehandon/vcs-ui'
 import { getAddress, upsertAddress, changePassword, updateProfile } from '../../api/account'
 import { useAuth } from '../../hooks/useAuth'
 import { Button } from '../../components/ui/Button'
@@ -110,53 +111,55 @@ export function ProfilePage() {
   }
 
   return (
-    <div className={styles.container}>
+    <Container size="md" padding="6">
       <h1 className={styles.title}>Profile &amp; Address</h1>
 
-      {/* Personal info */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Personal Details</h2>
-        <form onSubmit={(e) => void handleProfileSubmit(e)}>
-          {profileError && <p className={styles.error} role="alert">{profileError}</p>}
-          {profileSuccess && <p className={styles.success} role="status">Profile updated.</p>}
-          <div className={styles.row}>
-            <Input label="First Name" value={firstName} onChange={(e) => { setProfileSuccess(false); setFirstName(e.target.value) }} required />
-            <Input label="Last Name" value={lastName} onChange={(e) => { setProfileSuccess(false); setLastName(e.target.value) }} required />
-          </div>
-          <Input label="Phone" type="tel" value={phone} onChange={(e) => { setProfileSuccess(false); setPhone(e.target.value) }} required />
-          <p className={styles.emailNote}>{user?.email}</p>
-          <Button type="submit" loading={profileSaving}>Save Details</Button>
-        </form>
-      </section>
+      <Stack direction="column" gap="12">
+        {/* Personal info */}
+        <Box as="section">
+          <h2 className={styles.sectionTitle}>Personal Details</h2>
+          <Stack as="form" direction="column" gap="4" onSubmit={(e) => void handleProfileSubmit(e)}>
+            {profileError && <p className={styles.error} role="alert">{profileError}</p>}
+            {profileSuccess && <p className={styles.success} role="status">Profile updated.</p>}
+            <Grid columns={{ base: 1, sm: 2 }} gap="4">
+              <Input label="First Name" value={firstName} onChange={(e) => { setProfileSuccess(false); setFirstName(e.target.value) }} required />
+              <Input label="Last Name" value={lastName} onChange={(e) => { setProfileSuccess(false); setLastName(e.target.value) }} required />
+            </Grid>
+            <Input label="Phone" type="tel" value={phone} onChange={(e) => { setProfileSuccess(false); setPhone(e.target.value) }} required />
+            <p className={styles.emailNote}>{user?.email}</p>
+            <Button type="submit" loading={profileSaving}>Save Details</Button>
+          </Stack>
+        </Box>
 
-      {/* Address */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Delivery Address</h2>
-        <form onSubmit={(e) => void handleAddressSubmit(e)}>
-          {addressError && <p className={styles.error} role="alert">{addressError}</p>}
-          {addressSuccess && <p className={styles.success} role="status">Address saved.</p>}
-          <Input label="Street" value={address.street} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, street: e.target.value })) }} required />
-          <Input label="City" value={address.city} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, city: e.target.value })) }} required />
-          <div className={styles.row}>
-            <Input label="Country" value={address.country} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, country: e.target.value })) }} required />
-            <Input label="Postal Code" value={address.postal_code} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, postal_code: e.target.value })) }} required />
-          </div>
-          <Button type="submit" loading={addressSaving}>Save Address</Button>
-        </form>
-      </section>
+        {/* Address */}
+        <Box as="section">
+          <h2 className={styles.sectionTitle}>Delivery Address</h2>
+          <Stack as="form" direction="column" gap="4" onSubmit={(e) => void handleAddressSubmit(e)}>
+            {addressError && <p className={styles.error} role="alert">{addressError}</p>}
+            {addressSuccess && <p className={styles.success} role="status">Address saved.</p>}
+            <Input label="Street" value={address.street} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, street: e.target.value })) }} required />
+            <Input label="City" value={address.city} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, city: e.target.value })) }} required />
+            <Grid columns={{ base: 1, sm: 2 }} gap="4">
+              <Input label="Country" value={address.country} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, country: e.target.value })) }} required />
+              <Input label="Postal Code" value={address.postal_code} onChange={(e) => { setAddressSuccess(false); setAddress((p) => ({ ...p, postal_code: e.target.value })) }} required />
+            </Grid>
+            <Button type="submit" loading={addressSaving}>Save Address</Button>
+          </Stack>
+        </Box>
 
-      {/* Password */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Change Password</h2>
-        <form onSubmit={(e) => void handlePasswordSubmit(e)}>
-          {pwError && <p className={styles.error} role="alert">{pwError}</p>}
-          {pwSuccess && <p className={styles.success} role="status">Password changed.</p>}
-          <Input label="Current Password" type="password" value={currentPassword} onChange={(e) => { setPwSuccess(false); setCurrentPassword(e.target.value) }} required />
-          <Input label="New Password" type="password" value={newPassword} onChange={(e) => { setPwSuccess(false); setNewPassword(e.target.value) }} required />
-          <Input label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setPwSuccess(false); setConfirmPassword(e.target.value) }} required />
-          <Button type="submit" loading={pwSaving}>Change Password</Button>
-        </form>
-      </section>
-    </div>
+        {/* Password */}
+        <Box as="section">
+          <h2 className={styles.sectionTitle}>Change Password</h2>
+          <Stack as="form" direction="column" gap="4" onSubmit={(e) => void handlePasswordSubmit(e)}>
+            {pwError && <p className={styles.error} role="alert">{pwError}</p>}
+            {pwSuccess && <p className={styles.success} role="status">Password changed.</p>}
+            <Input label="Current Password" type="password" value={currentPassword} onChange={(e) => { setPwSuccess(false); setCurrentPassword(e.target.value) }} required />
+            <Input label="New Password" type="password" value={newPassword} onChange={(e) => { setPwSuccess(false); setNewPassword(e.target.value) }} required />
+            <Input label="Confirm New Password" type="password" value={confirmPassword} onChange={(e) => { setPwSuccess(false); setConfirmPassword(e.target.value) }} required />
+            <Button type="submit" loading={pwSaving}>Change Password</Button>
+          </Stack>
+        </Box>
+      </Stack>
+    </Container>
   )
 }

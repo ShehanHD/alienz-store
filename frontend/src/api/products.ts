@@ -11,6 +11,7 @@ interface ProductFilters {
   max_price?: number
   color?: string
   size?: string
+  featured?: boolean
 }
 
 export async function getProducts(filters: ProductFilters = {}): Promise<PaginatedResponse<Product>> {

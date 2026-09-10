@@ -1,174 +1,28 @@
-.page {
-  padding: var(--space-12) var(--space-8);
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: var(--space-6) var(--space-4);
-  }
-}
-
+/* Residual admin-products styling: title/header chrome, status icon colors,
+   error text. Page padding + pagination row live on vcs-ui Box/Stack. */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-8);
-  padding-bottom: var(--space-6);
+  margin-bottom: var(--sp-8);
+  padding-bottom: var(--sp-6);
   border-bottom: 1px solid var(--border);
 }
 
-.header h1 {
-  font-family: var(--font-heading);
+.title {
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 400;
   letter-spacing: 0.02em;
 }
 
-.addButton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0.75rem 1.5rem;
-  background: var(--accent);
-  color: #ffffff;
-  border: 1px solid var(--accent);
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background var(--transition);
-}
-
-.addButton:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
 .error {
-  color: var(--error);
+  color: var(--danger);
   font-size: 0.6875rem;
   letter-spacing: 0.05em;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--sp-6);
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-  table-layout: fixed;
-}
+.iconOn  { color: var(--text); }
+.iconOff { color: var(--border-strong); }
 
-.colName    { width: auto; }
-.colNarrow  { width: 90px; }
-.colActions { width: 90px; }
-
-.table th {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  font-size: 0.5625rem;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-secondary);
-}
-
-.table td {
-  padding: var(--space-4) var(--space-4);
-  border-bottom: 1px solid var(--border);
-  font-weight: 300;
-  color: var(--text-primary);
-  vertical-align: middle;
-}
-
-.table td:not(:first-child) {
-  text-align: center;
-}
-
-.table td:last-child {
-  text-align: right;
-}
-
-/* Status icons */
-.iconOn  { color: var(--text-primary); }
-.iconOff { color: var(--border-dark); }
-
-/* Icon-only action buttons */
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-3);
-}
-
-.iconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border-dark);
-  background: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  text-decoration: none;
-  transition: border-color var(--transition), color var(--transition);
-}
-
-.iconBtn:hover {
-  border-color: var(--text-primary);
-  color: var(--text-primary);
-}
-
-.iconBtnDanger:hover {
-  border-color: var(--error);
-  color: var(--error);
-}
-
-/* Table scroll wrapper */
-.tableWrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Pagination */
 .pagination {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-8);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-.pageBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border-dark);
-  background: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: border-color var(--transition), color var(--transition);
-}
-
-.pageBtn:hover {
-  border-color: var(--text-primary);
-  color: var(--text-primary);
-}
-
-@media (max-width: 768px) {
-  .iconBtn,
-  .iconBtnDanger,
-  .pageBtn {
-    min-width: 44px;
-    min-height: 44px;
-  }
+  margin-top: var(--sp-8);
 }

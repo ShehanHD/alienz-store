@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Input, Textarea, Button, Box, Stack, Grid } from '@shehandon/vcs-ui'
 import { submitEnquiry } from '../../api/enquiries'
 import styles from './Footer.module.css'
 
@@ -53,26 +54,26 @@ export function Footer() {
   }
 
   return (
-    <footer className={styles.footer}>
-      <div className={styles.grid}>
+    <Box as="footer" px={{ base: '6', md: '12' }} py="12" className={styles.footer} data-mode="dark">
+      <Grid columns={{ base: 1, md: 2 }} gap="12">
 
         {/* Left — info */}
-        <div className={styles.info}>
-          <div className={styles.block}>
+        <Stack direction="column" gap="8">
+          <Stack direction="column" gap="2">
             <p className={styles.colTitle}>Navigate</p>
             <Link to="/shop" className={styles.navLink}>Shop</Link>
             <Link to="/contact" className={styles.navLink}>Contact</Link>
-          </div>
+          </Stack>
 
-          <div className={styles.block}>
+          <Stack direction="column" gap="2">
             <p className={styles.colTitle}>Get in Touch</p>
             <a href={`tel:${PHONE.replace(/\s/g, '')}`} className={styles.contactText}>{PHONE}</a>
             <a href={`mailto:${EMAIL}`} className={styles.contactText}>{EMAIL}</a>
-          </div>
+          </Stack>
 
-          <div className={styles.block}>
+          <Stack direction="column" gap="2">
             <p className={styles.colTitle}>Follow</p>
-            <div className={styles.social}>
+            <Stack direction="row" gap="3">
               <a
                 href={INSTAGRAM_URL}
                 target="_blank"
@@ -91,15 +92,14 @@ export function Footer() {
               >
                 <TikTokIcon />
               </a>
-            </div>
-          </div>
-        </div>
+            </Stack>
+          </Stack>
+        </Stack>
 
         {/* Right — contact form */}
-        <form onSubmit={(e) => void handleSubmit(e)} className={styles.formCol}>
+        <Stack as="form" direction="column" gap="4" onSubmit={(e) => void handleSubmit(e)}>
           <p className={styles.formTitle}>Send a Message</p>
-          <input
-            className={styles.input}
+          <Input
             type="text"
             placeholder="Name"
             aria-label="Name"
@@ -107,8 +107,7 @@ export function Footer() {
             onChange={(e) => setName(e.target.value)}
             required
           />
-          <input
-            className={styles.input}
+          <Input
             type="email"
             placeholder="Email"
             aria-label="Email"
@@ -116,24 +115,25 @@ export function Footer() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <textarea
-            className={styles.textarea}
+          <Textarea
             placeholder="Message"
             aria-label="Message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
+            rows={3}
           />
           {sent && <p className={styles.successMsg}>Message sent — we&apos;ll be in touch.</p>}
           {error && <p className={styles.errorMsg}>{error}</p>}
-          <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? 'Sending…' : 'Send Message'}
-          </button>
-        </form>
+          <Button type="submit" variant="secondary" loading={loading} className={styles.submitBtn}>
+            Send Message
+          </Button>
+        </Stack>
 
-      </div>
+      </Grid>
 
-      <p className={styles.copyright}>© {new Date().getFullYear()} AlienzStore</p>
-    </footer>
+      <img src="/logo.png" alt="The Alienz" className={styles.logo} />
+      <p className={styles.copyright}>© {new Date().getFullYear()} The Alienz</p>
+    </Box>
   )
 }

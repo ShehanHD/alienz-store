@@ -1,27 +1,29 @@
-.page {
-  padding: var(--space-6);
-  max-width: 900px;
+/* Residual admin-collaborators styling: title/typography, table + cell
+   chrome, image preview, remove-link button, badge. Page padding, header row,
+   dialog-form stacks and image/type rows live on vcs-ui Box/Stack
+   (CollaboratorsAdminPage.tsx). */
+.title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 .pageHeader {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: var(--space-8);
-  gap: var(--space-4);
+  margin-bottom: var(--sp-8);
+  padding-bottom: var(--sp-6);
+  border-bottom: 1px solid var(--border);
 }
 
-.pageHeader h1 {
-  font-size: 1.1rem;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  margin: 0;
+.empty {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  padding: var(--sp-4) 0;
 }
-
-/* ── Table ── */
 
 .tableWrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -32,88 +34,60 @@
 
 .table th {
   text-align: left;
+  padding: var(--sp-3) var(--sp-4);
   font-size: 0.5625rem;
-  letter-spacing: 0.12em;
+  font-weight: 500;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  padding: var(--space-2) var(--space-3);
+  color: var(--text-muted);
   border-bottom: 1px solid var(--border);
-  font-weight: 400;
+  background: var(--bg-subtle);
 }
 
 .table td {
-  padding: var(--space-3);
+  padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
-.table tr:hover td {
-  background: var(--bg-secondary);
-}
-
-.rowDragging td {
-  background: var(--bg-secondary);
-  opacity: 0.5;
-}
-
-.dragCell {
-  width: 28px;
+.table tr {
   cursor: grab;
-  color: var(--text-secondary);
-  padding-right: 0;
+  user-select: none;
+  transition: opacity var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 
-.thumbCell {
-  width: 52px;
-  padding-right: 0;
-}
+.table tr:active { cursor: grabbing; }
+.rowDragging { opacity: 0.4; background: var(--bg-subtle); }
+
+.dragCell { color: var(--text-muted); text-align: center; }
 
 .listThumb {
-  display: block;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
+  border-radius: var(--r-sm);
 }
 
 .listThumbEmpty {
-  width: 44px;
-  height: 44px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  width: 40px;
+  height: 40px;
+  background: var(--bg-inset);
+  border-radius: var(--r-sm);
 }
 
-.nameCell {
-  font-weight: 400;
-}
-
-.typeCell {
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.instagramCell {
-  color: var(--text-secondary);
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.thumbCell { width: 56px; }
+.nameCell { font-weight: 400; }
+.typeCell { text-transform: capitalize; color: var(--text-muted); }
+.instagramCell { max-width: 220px; }
 
 .instagramLink {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.75rem;
-  transition: color var(--transition);
+  transition: color var(--dur) var(--ease);
 }
 
-.instagramLink:hover {
-  color: var(--text-primary);
-}
+.instagramLink:hover { color: var(--text); }
 
 .badge {
   display: inline-block;
@@ -121,63 +95,18 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 2px 6px;
-  background: var(--gold);
-  color: #fff;
+  background: var(--accent);
+  color: var(--accent-fg);
 }
 
-.actionsCell {
-  text-align: right;
-  white-space: nowrap;
-}
+.actionsCell { text-align: right; white-space: nowrap; }
 
-.iconBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-1);
-  color: var(--text-secondary);
-  transition: color var(--transition);
-}
-
-.iconBtn:hover {
-  color: var(--text-primary);
-}
-
-.iconBtnDanger:hover {
-  color: #c0392b;
-}
-
-.empty {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-}
-
-.error {
-  color: #c0392b;
-  font-size: 0.75rem;
-}
-
-/* ── Dialog form ── */
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-/* Image upload */
-
-.imageSection {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-6);
-}
-
+/* Dialog form */
 .imagePreview {
   width: 120px;
   height: 120px;
   flex-shrink: 0;
-  background: var(--bg-secondary);
+  background: var(--bg-subtle);
   background-size: cover;
   background-position: center;
   border: 1px solid var(--border);
@@ -190,147 +119,37 @@
   font-size: 0.5625rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-align: center;
-  padding: var(--space-2);
-}
-
-.imageActions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding-top: var(--space-1);
-}
-
-.imageUploadBtn {
-  display: inline-block;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border: 1px solid var(--border-dark);
-  padding: 0.5rem 1.25rem;
-  cursor: pointer;
-  color: var(--text-primary);
-  transition: border-color var(--transition), background var(--transition);
-  text-align: center;
-  font-family: var(--font-body);
-}
-
-.imageUploadBtn:hover {
-  border-color: var(--text-primary);
-  background: var(--bg-secondary);
+  padding: var(--sp-2);
 }
 
 .imageRemoveBtn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--sp-1);
   background: none;
   border: none;
   cursor: pointer;
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   padding: 0;
-  transition: color var(--transition);
-  font-family: var(--font-body);
+  transition: color var(--dur) var(--ease);
+  font-family: var(--font-sans);
 }
 
-.imageRemoveBtn:hover {
-  color: #c0392b;
-}
-
-/* Fields */
-
-.fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
+.imageRemoveBtn:hover { color: var(--danger); }
 
 .label {
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
-.required {
-  color: var(--error);
-}
-
-.input {
-  padding: 0.75rem var(--space-4);
-  border: 1px solid var(--border-dark);
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 300;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  transition: border-color var(--transition);
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--text-primary);
-}
-
-/* Type toggle */
-
-.typeToggle {
-  display: flex;
-  gap: 0;
-  border: 1px solid var(--border-dark);
-  width: fit-content;
-}
-
-.typeOption {
-  padding: 0.4rem 1rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: background var(--transition), color var(--transition);
-  user-select: none;
-}
-
-.typeOption + .typeOption {
-  border-left: 1px solid var(--border-dark);
-}
-
-.typeOptionActive {
-  background: var(--text-primary);
-  color: var(--bg-primary);
-}
-
-.checkRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 300;
-  color: var(--text-secondary);
-  padding: var(--space-2) 0;
-}
-
-.checkRow span {
-  line-height: 1.4;
-}
-
-/* Footer */
-
-.formFooter {
-  display: flex;
-  gap: var(--space-3);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border);
+.error {
+  color: var(--danger);
+  font-size: 0.75rem;
 }

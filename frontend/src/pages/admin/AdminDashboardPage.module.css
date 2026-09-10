@@ -1,66 +1,62 @@
-.page {
-  padding: var(--space-12) var(--space-8);
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: var(--space-6) var(--space-4);
-  }
-}
-
-.page h1 {
-  font-family: var(--font-heading);
+/* Residual admin-dashboard styling: title typography + error text. Page
+   padding + stat grid live on vcs-ui Box/Grid. */
+.title {
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 400;
   letter-spacing: 0.02em;
-  margin-bottom: var(--space-12);
-  padding-bottom: var(--space-6);
+  margin-bottom: var(--sp-12);
+  padding-bottom: var(--sp-6);
   border-bottom: 1px solid var(--border);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-6);
-  background: transparent;
-  margin-top: var(--space-8);
+.error {
+  color: var(--danger);
+  font-size: 0.75rem;
+  padding: var(--sp-4);
+  border: 1px solid var(--danger);
+  letter-spacing: 0.05em;
 }
 
-.card {
-  background: var(--bg-primary);
-  padding: var(--space-8);
+/* Charts row sits below the KPI cards. */
+.charts {
+  margin-top: var(--sp-6);
 }
 
-.card h2 {
+/* Full-width volume chart, its own row below the donut/gauge pair. */
+.volumeCard {
+  margin-top: var(--sp-6);
+}
+
+.chartTitle {
   font-size: 0.5625rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  margin: 0 0 var(--space-4);
+  color: var(--text-muted);
+  margin-bottom: var(--sp-4);
 }
 
-.stat {
-  font-family: var(--font-heading);
-  font-size: 3rem;
-  font-weight: 400;
-  margin: 0;
-  color: var(--text-primary);
-  line-height: 1;
+/* Acceptance gauge — centre the circular progress + its caption. */
+.gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  min-height: 200px;
 }
 
-.sub {
-  font-size: 0.6875rem;
-  font-weight: 300;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-  margin: var(--space-2) 0 0;
+/* Progress caps at size="lg" (64px); scale it up. The margin reserves the
+   extra visual size so the caption below isn't overlapped. */
+.gaugeCircle {
+  transform: scale(1.7);
+  margin: var(--sp-8) 0;
 }
 
-.error {
-  color: var(--error);
+.gaugeNote {
   font-size: 0.75rem;
-  padding: var(--space-4);
-  border: 1px solid var(--error);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  text-align: center;
 }

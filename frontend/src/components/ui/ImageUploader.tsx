@@ -1,6 +1,8 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
+import { FileUpload, Stack, Grid, Box } from '@shehandon/vcs-ui'
 import { deleteProductImage, setPrimaryImage } from '../../api/admin'
 import { useConfirm } from '../../contexts/ConfirmContext'
+import { Button } from './Button'
 import type { ProductImage } from '../../types'
 import styles from './ImageUploader.module.css'
 
@@ -19,25 +21,21 @@ export function ImageUploader({
   images, pendingFiles, maxImages, maxUploadMb,
   onImagesChange, onPendingChange, productId,
 }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
+  // Remounts FileUpload after each pick so its own internal file list clears —
+  // we keep pending files in our own thumbnail grid below instead.
+  const [uploadKey, setUploadKey] = useState(0)
   const confirm = useConfirm()
 
   const totalCount = images.length + pendingFiles.length
   const remaining = maxImages - totalCount
   const canAdd = remaining > 0
 
-  function handleSelect(fileList: FileList | null) {
-    if (!fileList) return
+  function handleSelect(files: File[]) {
     setError(null)
-    const incoming = Array.from(fileList).slice(0, remaining)
-    const oversized = incoming.filter((f) => f.size > maxUploadMb * 1024 * 1024)
-    if (oversized.length) {
-      setError(`${oversized.map((f) => `"${f.name}"`).join(', ')} exceed${oversized.length === 1 ? 's' : ''} the ${maxUploadMb}MB limit.`)
-    }
-    const valid = incoming.filter((f) => f.size <= maxUploadMb * 1024 * 1024)
-    if (valid.length) onPendingChange([...pendingFiles, ...valid])
-    if (inputRef.current) inputRef.current.value = ''
+    if (files.length === 0) return
+    onPendingChange([...pendingFiles, ...files])
+    setUploadKey((k) => k + 1)
   }
 
   function removePending(index: number) {
@@ -69,67 +67,64 @@ export function ImageUploader({
   }
 
   return (
-    <div className={styles.wrapper}>
+    <Stack direction="column" gap="4">
       {error && <p className={styles.error} role="alert">{error}</p>}
 
       {/* Existing uploaded images */}
       {images.length > 0 && (
-        <div className={styles.grid}>
+        <Grid minColWidth="100px" gap="3">
           {images.map((img) => (
-            <div key={img.id} className={`${styles.cell} ${img.is_primary ? styles.cellPrimary : ''}`}>
+            <Box key={img.id} className={`${styles.cell} ${img.is_primary ? styles.cellPrimary : ''}`}>
               <img src={img.thumbnail_url} alt="" className={styles.thumb} />
-              <div className={styles.cellActions}>
+              <Stack direction="row" align="center" gap="1" className={styles.cellActions}>
                 {img.is_primary
                   ? <span className={styles.primaryBadge}>Primary</span>
                   : productId
-                    ? <button type="button" className={styles.primaryBtn} onClick={() => void handleSetPrimary(img.id)} title="Set as primary">★</button>
+                    ? <Button variant="secondary" shape="square" size="sm" onClick={() => void handleSetPrimary(img.id)} title="Set as primary">★</Button>
                     : null
                 }
                 {productId && (
-                  <button type="button" className={styles.deleteBtn} onClick={() => void handleDelete(img.id)} title="Delete">✕</button>
+                  <Button variant="danger" shape="square" size="sm" onClick={() => void handleDelete(img.id)} title="Delete">✕</Button>
                 )}
-              </div>
-            </div>
+              </Stack>
+            </Box>
           ))}
-        </div>
+        </Grid>
       )}
 
       {/* Pending (queued) files — shown before upload */}
       {pendingFiles.length > 0 && (
-        <div className={styles.pendingGrid}>
+        <Grid minColWidth="100px" gap="3">
           {pendingFiles.map((file, i) => (
-            <div key={i} className={styles.pendingCell}>
+            <Box key={i} className={styles.pendingCell}>
               <img src={URL.createObjectURL(file)} alt={file.name} className={styles.thumb} />
-              <div className={styles.cellActions}>
+              <Stack direction="row" align="center" gap="1" className={styles.cellActions}>
                 <span className={styles.pendingBadge}>Queued</span>
-                <button type="button" className={styles.deleteBtn} onClick={() => removePending(i)} title="Remove">✕</button>
-              </div>
-            </div>
+                <Button variant="danger" shape="square" size="sm" onClick={() => removePending(i)} title="Remove">✕</Button>
+              </Stack>
+            </Box>
           ))}
-        </div>
+        </Grid>
       )}
 
-      {/* Counter + add button */}
-      <div className={styles.footer}>
+      {/* Counter + add zone */}
+      <Stack direction="row" align="center" gap="4" className={styles.footer}>
         <span className={styles.counter}>{totalCount} / {maxImages}</span>
         {canAdd ? (
-          <>
-            <button type="button" className={styles.uploadBtn} onClick={() => inputRef.current?.click()}>
-              Choose Images
-            </button>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              multiple={remaining > 1}
-              className={styles.hiddenInput}
-              onChange={(e) => handleSelect(e.target.files)}
-            />
-          </>
+          <FileUpload
+            key={uploadKey}
+            variant="zone"
+            accept="image/jpeg,image/png,image/webp"
+            multiple={remaining > 1}
+            maxFiles={remaining}
+            maxSize={maxUploadMb * 1024 * 1024}
+            onChange={handleSelect}
+            className={styles.fileUploadZone}
+          />
         ) : (
           <span className={styles.limitNote}>Limit reached</span>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   )
 }

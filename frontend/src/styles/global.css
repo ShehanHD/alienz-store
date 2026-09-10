@@ -1,5 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600&display=swap');
-@import './variables.css';
+/* Fonts are loaded via <link> in index.html. These override vcs-ui's own
+   font tokens (which default to Cormorant Garamond / DM Sans) to the
+   families we actually load. */
+:root {
+  --font-display: 'Cormorant', Georgia, serif;
+  --font-sans: 'Urbanist', system-ui, sans-serif;
+
+  /* vcs-ui's spacing scale stops at --sp-12 (3rem); these extend it in the
+     same convention for the couple of larger gaps the layout still needs. */
+  --sp-16: 4rem;
+  --sp-24: 6rem;
+
+  /* Site design is deliberately sharp/square-cornered. vcs-ui's own
+     data-radius="sharp" preset only multiplies --radius-base by 0.4
+     (1.6px on Ledger's 4px base) — visibly non-zero, reads as a rendering
+     glitch rather than an intentional corner. Zeroing --radius-base here
+     gives true 0px everywhere that reads --radius/--r-sm/--r-md/--r-lg,
+     regardless of --radius-factor. */
+  --radius-base: 0px;
+}
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -8,16 +26,16 @@
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-weight: 400;
-  color: var(--text-primary);
-  background: var(--bg-primary);
+  color: var(--text);
+  background: var(--bg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+  font-family: var(--font-display);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: 0.01em;

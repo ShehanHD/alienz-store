@@ -1,12 +1,16 @@
 import axios from 'axios'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { Stack } from '@shehandon/vcs-ui'
 import { confirmEmail, resendConfirmation } from '../../api/auth'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
-import styles from './RegisterPage.module.css'
+import { AuthLayout } from './AuthLayout'
+import styles from './AuthLayout.module.css'
 
 type State = 'loading' | 'success' | 'expired' | 'invalid'
+
+const BRAND_SUBTITLE = 'Confirm your email to activate your account.'
 
 export function ConfirmEmailPage() {
   const [searchParams] = useSearchParams()
@@ -47,60 +51,62 @@ export function ConfirmEmailPage() {
 
   if (state === 'loading') {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.form}>
-          <p>Confirming your email…</p>
-        </div>
-      </div>
+      <AuthLayout brandSubtitle={BRAND_SUBTITLE}>
+        <p className={styles.subheading}>Confirming your email…</p>
+      </AuthLayout>
     )
   }
 
   if (state === 'success') {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.form}>
-          <h1 className={styles.heading}>Email confirmed!</h1>
-          <p>Your account is now active.</p>
-          <Link to="/auth/login">Sign in →</Link>
+      <AuthLayout brandSubtitle={BRAND_SUBTITLE}>
+        <div>
+          <h1 className={styles.heading}>Email confirmed</h1>
+          <p className={styles.subheading}>Your account is now active.</p>
         </div>
-      </div>
+        <p className={styles.foot}>
+          <Link to="/auth/login" className={styles.inlineLink}>Sign in →</Link>
+        </p>
+      </AuthLayout>
     )
   }
 
   if (state === 'expired') {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.form}>
+      <AuthLayout brandSubtitle={BRAND_SUBTITLE}>
+        <div>
           <h1 className={styles.heading}>Link has expired</h1>
-          <p>Your confirmation link is no longer valid. Enter your email to get a new one.</p>
-          {resendSent ? (
-            <p>New link sent — check your inbox.</p>
-          ) : (
-            <form onSubmit={(e) => void handleResend(e)}>
-              <Input
-                label="Email"
-                type="email"
-                value={resendEmail}
-                onChange={(e) => setResendEmail(e.target.value)}
-                required
-              />
-              {resendError && <p role="alert">{resendError}</p>}
-              <Button type="submit" loading={resendLoading}>Resend</Button>
-            </form>
-          )}
+          <p className={styles.subheading}>Your confirmation link is no longer valid. Enter your email to get a new one.</p>
         </div>
-      </div>
+        {resendSent ? (
+          <p className={styles.subheading}>New link sent — check your inbox.</p>
+        ) : (
+          <Stack as="form" direction="column" gap="4" onSubmit={(e) => void handleResend(e)}>
+            <Input
+              label="Email"
+              type="email"
+              value={resendEmail}
+              onChange={(e) => setResendEmail(e.target.value)}
+              required
+            />
+            {resendError && <p className={styles.error} role="alert">{resendError}</p>}
+            <Button type="submit" loading={resendLoading}>Resend</Button>
+          </Stack>
+        )}
+      </AuthLayout>
     )
   }
 
   // invalid
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.form}>
+    <AuthLayout brandSubtitle={BRAND_SUBTITLE}>
+      <div>
         <h1 className={styles.heading}>Invalid link</h1>
-        <p>This confirmation link is invalid or has already been used.</p>
-        <Link to="/auth/login">Go to sign in</Link>
+        <p className={styles.subheading}>This confirmation link is invalid or has already been used.</p>
       </div>
-    </div>
+      <p className={styles.foot}>
+        <Link to="/auth/login" className={styles.inlineLink}>Go to sign in</Link>
+      </p>
+    </AuthLayout>
   )
 }

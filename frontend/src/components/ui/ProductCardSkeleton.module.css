@@ -1,0 +1,14 @@
+/* Skeleton placeholder dimensions matching the real card's name/price line
+   sizes. No vcs-ui prop for exact placeholder widths. */
+.name {
+  width: 65%;
+  height: 1rem;
+  border-radius: var(--r-sm);
+}
+
+.price {
+  width: 3.25rem;
+  height: 0.8125rem;
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+}

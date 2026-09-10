@@ -1,51 +1,52 @@
-.card {
+/* Residual product-card styling: flat/transparent card, image framing +
+   hover-zoom, and name/price typography. Card body row layout lives on
+   vcs-ui Stack; the image ratio on AspectRatio (ProductCard.tsx). */
+
+.link {
   display: block;
   text-decoration: none;
   color: inherit;
-  background: var(--bg-card);
-  border: none;
 }
 
-
-.card:hover .image {
+.link:hover .image {
   transform: scale(1.03);
+}
+
+/* vcs-ui Card defaults to variant="outline" + var(--glass-bg); shop cards
+   are flat and transparent, separated only by the image. */
+.card {
+  border: none;
+  background: none;
 }
 
 .imageWrapper {
   overflow: hidden;
   border-radius: 12px;
+  padding: 0;
 }
 
 .image {
   width: 100%;
-  aspect-ratio: 3/4;
+  height: 100%;
   object-fit: cover;
   display: block;
   transition: transform 0.4s ease;
 }
 
-.body {
-  padding: var(--space-4) var(--space-4) var(--space-6);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-4);
-}
-
 .name {
-  font-family: var(--font-heading);
+  font-family: var(--font-display);
   font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .price {
   font-size: 0.8125rem;
   font-weight: 400;
   letter-spacing: 0.06em;
-  color: var(--gold);
+  color: var(--accent);
   margin: 0;
   white-space: nowrap;
   flex-shrink: 0;

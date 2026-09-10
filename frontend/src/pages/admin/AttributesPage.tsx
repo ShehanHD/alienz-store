@@ -9,6 +9,7 @@ import { Input } from '../../components/ui/Input'
 import { PageLoader } from '../../components/ui/PageLoader'
 import { useDragSort } from '../../hooks/useDragSort'
 import { useConfirm } from '../../contexts/ConfirmContext'
+import { Box, Stack } from '@shehandon/vcs-ui'
 import { Trash2, Plus } from 'lucide-react'
 import styles from './AttributesPage.module.css'
 
@@ -63,11 +64,11 @@ function AttributeSection({ type, initialItems, onAdd, onDelete }: SectionProps)
   }
 
   return (
-    <section className={styles.section}>
-      <h2>{ATTRIBUTE_LABELS[type]}</h2>
+    <Box as="section" mb="12">
+      <h2 className={styles.sectionTitle}>{ATTRIBUTE_LABELS[type]}</h2>
       {addError && <p role="alert" className={styles.error}>{addError}</p>}
 
-      <form onSubmit={(e) => void handleAdd(e)} className={styles.form}>
+      <Stack as="form" direction="row" align="end" wrap gap="3" onSubmit={(e) => void handleAdd(e)} className={styles.form}>
         <Input
           label={`New ${ATTRIBUTE_LABELS[type]}`}
           value={newName}
@@ -76,7 +77,7 @@ function AttributeSection({ type, initialItems, onAdd, onDelete }: SectionProps)
           required
         />
         <Button type="submit" loading={submitting}><Plus size={13} strokeWidth={1.5} aria-hidden="true" /> Add</Button>
-      </form>
+      </Stack>
 
       {items.length === 0 ? (
         <p className={styles.empty}>No {ATTRIBUTE_LABELS[type].toLowerCase()} options yet.</p>
@@ -107,16 +108,16 @@ function AttributeSection({ type, initialItems, onAdd, onDelete }: SectionProps)
                 <td className={styles.dragCell}><DragIcon /></td>
                 <td>{item.name}</td>
                 <td className={styles.actionsCell}>
-                  <button type="button" className={styles.iconBtnDanger} onClick={() => void onDelete(item.id)} title="Delete" aria-label="Delete">
+                  <Button variant="danger" shape="square" size="sm" onClick={() => void onDelete(item.id)} title="Delete" aria-label="Delete">
                     <Trash2 size={14} strokeWidth={1.5} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-    </section>
+    </Box>
   )
 }
 
@@ -160,8 +161,8 @@ export function AttributesPage() {
   if (loadError) return <p role="alert" className={styles.error}>{loadError}</p>
 
   return (
-    <div className={styles.page}>
-      <h1>Attributes</h1>
+    <Box px={{ base: '4', md: '8' }} py={{ base: '6', md: '12' }}>
+      <h1 className={styles.title}>Attributes</h1>
       {TYPES.map((type) => (
         <AttributeSection
           key={type}
@@ -171,6 +172,6 @@ export function AttributesPage() {
           onDelete={handleDelete(type)}
         />
       ))}
-    </div>
+    </Box>
   )
 }

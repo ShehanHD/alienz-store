@@ -1,17 +1,11 @@
-import styles from './Input.module.css'
+import { Input as VcsInput } from '@shehandon/vcs-ui'
+import type { InputProps as VcsInputProps } from '@shehandon/vcs-ui'
 
-interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props extends Omit<VcsInputProps, 'error' | 'label'> {
   readonly label: string
   readonly error?: string
 }
 
-export function Input({ label, error, id, ...rest }: Props) {
-  const inputId = id ?? label.toLowerCase().replace(/\s+/g, '-')
-  return (
-    <div className={styles.field}>
-      <label htmlFor={inputId} className={styles.label}>{label}</label>
-      <input id={inputId} {...rest} className={`${styles.input} ${error ? styles.hasError : ''}`} />
-      {error && <span className={styles.error}>{error}</span>}
-    </div>
-  )
+export function Input({ label, error, ...rest }: Props) {
+  return <VcsInput label={label} error={!!error} helperText={error} {...rest} />
 }

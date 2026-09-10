@@ -16,6 +16,7 @@ htmlcov/
 node_modules/
 dist/
 .parcel-cache/
+.npmrc
 
 # Keep compiled email templates (needed for Vercel deployment)
 !api/emails/dist/
@@ -36,3 +37,5 @@ dist/
 .worktrees
 .worktrees/
 .superpowers/
+.vercel
+.env*

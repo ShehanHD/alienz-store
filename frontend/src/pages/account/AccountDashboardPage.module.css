@@ -1,46 +1,32 @@
-.container {
-  max-width: 800px;
-  margin: var(--space-16) auto;
-  padding: 0 var(--space-8);
-}
-
-@media (max-width: 768px) {
-  .container {
-    margin: var(--space-8) auto;
-    padding: 0 var(--space-4);
-  }
-}
-
+/* Residual account-dashboard styling: typography + nav-link chrome. Page
+   container + nav column live on vcs-ui Container/Stack. */
 .title {
-  font-family: var(--font-heading);
+  font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 400;
   letter-spacing: 0.02em;
-  margin-bottom: var(--space-12);
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-2);
 }
 
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+.greeting {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  margin-bottom: var(--sp-8);
 }
 
 .navLink {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6) 0;
+  display: block;
+  padding: var(--sp-4) 0;
   border-bottom: 1px solid var(--border);
-  text-decoration: none;
-  color: var(--text-primary);
   font-size: 0.8125rem;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  transition: color var(--transition);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
 }
 
 .navLink:hover {
-  color: var(--gold);
+  color: var(--accent);
 }
